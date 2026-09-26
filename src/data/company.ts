@@ -25,7 +25,7 @@ export const defaultCompany: CompanyProfile = {
       valueRange: "$500K–$1M",
       outcome: "Reduced peak-energy consumption reporting time by 43%.",
       tags: ["utility", "analytics", "Ontario", "energy"],
-      referenceReady: false,
+      referenceReady: true,
     },
     {
       id: "project-retrofit",

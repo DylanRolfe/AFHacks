@@ -26,7 +26,7 @@ export function OpportunityList() {
   const [methodology, setMethodology] = useState(false);
   useEffect(() => {
     const d = new URLSearchParams(window.location.search).get("decision");
-    if (d && ["pursue", "partner", "pass"].includes(d)) setDecision(d);
+    if (d && ["ready", "review", "blocker"].includes(d)) setDecision(d);
   }, []);
   const ranked = useMemo(
     () =>
@@ -66,16 +66,16 @@ export function OpportunityList() {
   return (
     <>
       <PageHeader
-        eyebrow="FIND YOUR NEXT OPPORTUNITY"
-        title="Good opportunities. Better decisions."
-        description={`Curated federal and Ontario public opportunities matched to ${company.name}.`}
+        eyebrow="PRE-BID READINESS"
+        title="Check the requirements before you commit."
+        description={`Compare Demo tender records with ${company.name}'s declared evidence before proposal work begins.`}
         action={
           <button
             className="button secondary"
             onClick={() => setMethodology(true)}
           >
             <CircleHelp size={16} />
-            How matching works
+            How readiness works
           </button>
         }
       />
@@ -87,12 +87,12 @@ export function OpportunityList() {
           All opportunities<span>{tenders.length}</span>
         </button>
         <button
-          className={decision === "pursue" ? "selected" : ""}
-          onClick={() => setDecision("pursue")}
+          className={decision === "ready" ? "selected" : ""}
+          onClick={() => setDecision("ready")}
         >
-          Recommended
+          Ready to prepare a bid
           <span>
-            {ranked.filter((r) => r.match.decision === "pursue").length}
+            {ranked.filter((r) => r.match.decision === "ready").length}
           </span>
         </button>
       </div>
@@ -133,7 +133,7 @@ export function OpportunityList() {
                 label: "Decision",
                 value: decision,
                 setter: setDecision,
-                options: ["pursue", "partner", "pass"],
+                options: ["ready", "review", "blocker"],
               },
             ].map((f) => (
               <select
@@ -170,7 +170,7 @@ export function OpportunityList() {
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
-              <option value="best">Best match</option>
+              <option value="best">Highest readiness</option>
               <option value="closing">Closing soon</option>
               <option value="newest">Newest</option>
             </select>
@@ -179,7 +179,7 @@ export function OpportunityList() {
         {filtered.length ? (
           <div className="opportunity-results">
             <div className="result-column-headings">
-              <span>FIT ASSESSMENT</span>
+              <span>BID READINESS</span>
               <span>OPPORTUNITY</span>
               <span>CLOSING DATE</span>
               <span />
@@ -239,7 +239,7 @@ export function OpportunityList() {
       <Dialog
         open={methodology}
         onClose={() => setMethodology(false)}
-        title="How matching works"
+        title="How readiness works"
       >
         <MethodologyContent />
       </Dialog>

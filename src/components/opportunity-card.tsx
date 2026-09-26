@@ -24,7 +24,7 @@ export function OpportunityCard({
         <div className="card-badges">
           <DecisionBadge decision={match.decision} />
           <span className={`match-inline ${match.decision}`}>
-            <strong>{match.score}%</strong> match
+            <strong>{match.score}%</strong> readiness
           </span>
         </div>
       </div>

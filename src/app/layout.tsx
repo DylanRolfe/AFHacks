@@ -3,20 +3,20 @@ import localFont from "next/font/local";
 import { CompanyProvider } from "@/components/company-provider";
 import { AppShell } from "@/components/app-shell";
 import "./globals.css";
+
 const inter = localFont({
   src: "../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
   variable: "--font-inter",
   display: "swap",
   weight: "100 900",
 });
+
 export const metadata: Metadata = {
-  title: {
-    default: "BidNorth — Your next opportunity",
-    template: "%s | BidNorth",
-  },
+  title: { default: "BidNorth — Pre-bid readiness", template: "%s | BidNorth" },
   description:
-    "Find government contracts your business can actually pursue. An explainable procurement co-pilot for Canadian small businesses.",
+    "Know if you are ready before you bid. A pre-bid readiness check for Canadian small businesses.",
 };
+
 export default function RootLayout({
   children,
 }: {

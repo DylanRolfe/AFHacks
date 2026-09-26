@@ -4,7 +4,8 @@ import type {
   Tender,
   RequirementStatus,
 } from "@/types/procurement";
-import { dateLabel, normalize, reviewDate } from "./utils";
+import { normalize } from "./utils";
+import { createBidPlan } from "./bid-plan";
 
 export const MATCH_WEIGHTS = {
   serviceFit: 0.35,
@@ -51,53 +52,62 @@ export function calculateMatch(
   );
   const requirementStatuses: Record<string, RequirementStatus> = {};
   for (const req of tender.requirements) {
-    let status: RequirementStatus = "verified";
+    let status: RequirementStatus = "human_review";
+    if (
+      req.requiredCertifications?.length ||
+      req.requiredCapabilities?.length ||
+      req.kind
+    )
+      status = "verified";
     if (
       req.requiredCertifications?.some(
         (c) => !has(company.certifications, c),
       ) ||
       req.requiredCapabilities?.some((c) => !has(company.capabilities, c))
     )
-      status = "not_met";
-    if (req.kind === "region" && !covered) status = "not_met";
-    if (req.kind === "insurance" && status !== "not_met") {
+      status = req.mandatory ? "hard_blocker" : "missing_evidence";
+    if (req.kind === "region" && !covered)
+      status = req.mandatory ? "hard_blocker" : "missing_evidence";
+    if (req.kind === "insurance" && status !== "hard_blocker") {
       if (
         !company.insuranceExpiry ||
         company.insuranceCoverageMillions === undefined
       )
-        status = "needs_evidence";
+        status = "missing_evidence";
       else if (
         company.insuranceExpiry < tender.closingDate ||
         company.insuranceCoverageMillions < (req.minimumInsuranceMillions ?? 0)
       )
-        status = "not_met";
+        status = req.mandatory ? "hard_blocker" : "missing_evidence";
     }
-    if (req.kind === "projects") {
+    if (req.kind === "projects" && status !== "hard_blocker") {
       const required = req.minimumProjects ?? tender.comparableProjects;
       status =
         relevant.length < required
-          ? "needs_evidence"
+          ? "missing_evidence"
           : relevant.filter((p) => p.referenceReady).length < required
-            ? "needs_evidence"
+            ? "missing_evidence"
             : "verified";
     }
+    if (req.kind === "security" && status !== "hard_blocker")
+      status = "human_review";
     requirementStatuses[req.id] = status;
   }
   const mandatory = tender.requirements.filter((r) => r.mandatory);
   const blockers = mandatory.filter(
-    (r) => requirementStatuses[r.id] === "not_met",
-  );
-  const gaps = tender.requirements.filter(
-    (r) => requirementStatuses[r.id] === "needs_evidence",
+    (r) => requirementStatuses[r.id] === "hard_blocker",
   );
   const eligibility = Math.round(
     mandatory.length
       ? mandatory.reduce(
           (sum, r) =>
             sum +
-            { verified: 100, needs_evidence: 70, not_met: 0 }[
-              requirementStatuses[r.id]
-            ],
+            {
+              verified: 100,
+              missing_evidence: 50,
+              hard_blocker: 0,
+              human_review: 0,
+            }[requirementStatuses[r.id]],
           0,
         ) / mandatory.length
       : 100,
@@ -109,7 +119,7 @@ export function calculateMatch(
     .slice(0, tender.comparableProjects)
     .reduce((sum, credit) => sum + credit, 0);
   const projectEvidence = Math.round(
-    100 * Math.min(evidenceCredits / tender.comparableProjects, 1),
+    100 * Math.min(evidenceCredits / Math.max(tender.comparableProjects, 1), 1),
   );
   const operationalFit = Math.round(
     (covered ? 65 : 0) +
@@ -122,20 +132,21 @@ export function calculateMatch(
       projectEvidence * 0.2 +
       operationalFit * 0.15,
   );
-  const decision =
-    blockers.length || score < 45
-      ? "pass"
-      : score < 70 || (tender.strategicGap && serviceFit < 80)
-        ? "partner"
-        : "pursue";
+  const mandatoryNeedsVerification = mandatory.filter((r) =>
+    ["missing_evidence", "human_review"].includes(requirementStatuses[r.id]),
+  );
+  // Readiness is deliberately gated by mandatory evidence. A high fit score
+  // cannot turn an unverified mandatory item into a green light.
+  const decision: MatchResult["decision"] = blockers.length
+    ? "blocker"
+    : mandatoryNeedsVerification.length
+      ? "review"
+      : "ready";
   const summary = blockers.length
-    ? `Mandatory gap: ${blockers[0].text.toLowerCase()}. Resolve this before investing in a response.`
-    : decision === "pursue"
-      ? `Strong service and geographic fit${gaps.length ? "; prepare comparable-project references before drafting." : "; your supporting evidence is ready for review."}`
-      : decision === "partner"
-        ? (tender.strategicGap ??
-          "Relevant experience provides a starting point; a specialist partner could address the remaining service gaps.")
-        : "Limited overlap with your core capabilities and comparable project experience.";
+    ? `Hard stop: ${blockers[0].text}. Resolve this mandatory requirement before assigning proposal-writing time.`
+    : mandatoryNeedsVerification.length
+      ? `${mandatoryNeedsVerification.length === 2 ? "Two" : mandatoryNeedsVerification.length} mandatory item${mandatoryNeedsVerification.length === 1 ? " is" : "s are"} not yet verified. Resolve these gaps before assigning proposal-writing time.`
+      : "All mandatory items are verified against the declared profile. Confirm the complete official tender package before preparing a bid.";
   const reasons = [
     matchedCapabilities.length
       ? `${matchedCapabilities.join(", ")} align with ${matchedCapabilities.length} of ${tender.serviceCapabilities.length} service areas.`
@@ -147,40 +158,7 @@ export function calculateMatch(
         : "The hybrid / remote delivery model fits your declared service coverage."
       : `Your profile does not include coverage in ${tender.requiredRegions.join(", ")}.`,
   ];
-  const nextActions: MatchResult["nextActions"] = [
-    {
-      id: "qualify",
-      timing: "Today",
-      title: blockers.length
-        ? `Resolve: ${blockers[0].text}`
-        : "Confirm insurance coverage and expiry against the full notice",
-      complete: false,
-    },
-    {
-      id: "evidence",
-      timing: "Within 2 days",
-      title: gaps.length
-        ? `Prepare ${tender.comparableProjects} comparable-project references${relevant.some((p) => p.id === "project-waterloo") ? ", starting with the Waterloo utility project" : ""}`
-        : "Assemble the verified qualifications and reference package",
-      complete: false,
-    },
-    {
-      id: "approach",
-      timing: "Within 5 days",
-      title:
-        tender.strategicGap && decision !== "pursue"
-          ? tender.strategicGap
-          : `Draft the ${tender.evaluationCriteria[0].name.toLowerCase()} response`,
-      complete: false,
-    },
-    {
-      id: "review",
-      timing: `Before ${dateLabel(reviewDate(tender.closingDate))}`,
-      title: "Complete an internal compliance and pricing review",
-      complete: false,
-    },
-  ];
-  return {
+  const result: MatchResult = {
     tenderId: tender.id,
     score,
     decision,
@@ -191,8 +169,18 @@ export function calculateMatch(
     summary,
     reasons,
     requirementStatuses,
-    nextActions,
+    nextActions: [],
   };
+  result.nextActions = createBidPlan(company, tender, result).map(
+    (phase, i) => ({
+      id: `${i}-0`,
+      timing: phase.timing,
+      title: phase.tasks[0],
+      owner: phase.owner,
+      complete: false,
+    }),
+  );
+  return result;
 }
 
 export function profileReadiness(company: CompanyProfile) {

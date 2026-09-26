@@ -22,13 +22,13 @@ export function BidCoach({
     getFallbackInsight(company, tender, match),
   );
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState("Profile-based guidance");
+  const [mode, setMode] = useState("Profile-based readiness guidance");
   const pending = useRef<AbortController | null>(null);
   useEffect(() => {
     pending.current?.abort();
     pending.current = null;
     setInsight(getFallbackInsight(company, tender, match));
-    setMode("Profile-based guidance");
+    setMode("Profile-based readiness guidance");
     setLoading(false);
     return () => {
       pending.current?.abort();
@@ -53,7 +53,7 @@ export function BidCoach({
       const validated = coachSchema.parse(data.insight);
       if (pending.current !== controller) return;
       setInsight(validated);
-      setMode(data.mode === "ai" ? "AI analysis · GPT-6 Astra" : data.message);
+      setMode(data.mode === "ai" ? "AI analysis · DeepSeek" : data.message);
     } catch {
       if (pending.current === controller) {
         setInsight(getFallbackInsight(company, tender, match));
@@ -69,7 +69,7 @@ export function BidCoach({
       <div className="panel-heading">
         <h2>
           <Sparkles size={18} />
-          AI Bid Coach
+          Readiness Coach
         </h2>
         <span className="coach-label">BIDNORTH</span>
       </div>
@@ -104,13 +104,17 @@ export function BidCoach({
         )}
       </div>
       <div className="coach-bottom">
+        <p>
+          Guidance only. No eligibility determination, legal advice, or award
+          prediction.
+        </p>
         <button
           className="button secondary full-width"
           onClick={refresh}
           disabled={loading}
         >
           <RefreshCw size={14} className={loading ? "spin" : ""} />
-          {loading ? "Reviewing your fit…" : "Refresh analysis"}
+          {loading ? "Reviewing readiness…" : "Refresh readiness check"}
         </button>
         <p>
           Recommendations are based on your profile and the tender information

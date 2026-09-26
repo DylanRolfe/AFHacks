@@ -1,5 +1,6 @@
-export type Decision = "pursue" | "partner" | "pass";
-export type RequirementStatus = "verified" | "needs_evidence" | "not_met";
+export type Decision = "ready" | "review" | "blocker";
+export type RequirementStatus =
+  "verified" | "missing_evidence" | "hard_blocker" | "human_review";
 export interface CompanyProject {
   id: string;
   title: string;
@@ -30,7 +31,7 @@ export interface TenderRequirement {
   sourceReference: string;
   requiredCapabilities?: string[];
   requiredCertifications?: string[];
-  kind?: "region" | "insurance" | "projects";
+  kind?: "region" | "insurance" | "projects" | "security";
   minimumProjects?: number;
   minimumInsuranceMillions?: number;
 }
@@ -72,6 +73,7 @@ export interface MatchResult {
     id: string;
     title: string;
     timing: string;
+    owner: string;
     complete: boolean;
   }[];
 }

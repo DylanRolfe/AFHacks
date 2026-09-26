@@ -1,6 +1,7 @@
-import { ArrowUpRight, Check, FileText, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, FileText, ShieldCheck } from "lucide-react";
 import { METHODOLOGY, DATASET_DATE } from "@/data/tenders";
 import { dateLabel } from "@/lib/utils";
+
 export function MethodologyContent() {
   return (
     <div className="methodology-content">
@@ -8,22 +9,22 @@ export function MethodologyContent() {
       <div className="weight-grid">
         {[
           {
-            label: "Service fit",
+            label: "Capability coverage",
             weight: 35,
-            desc: "Your capabilities and related project tags.",
+            desc: "Declared capabilities and related project tags.",
           },
           {
-            label: "Eligibility",
+            label: "Mandatory requirements",
             weight: 30,
-            desc: "Mandatory qualifications and delivery coverage.",
+            desc: "Required qualifications and delivery coverage.",
           },
           {
-            label: "Project evidence",
+            label: "Company evidence",
             weight: 20,
             desc: "Comparable experience and prepared references.",
           },
           {
-            label: "Operational fit",
+            label: "Delivery readiness",
             weight: 15,
             desc: "Geography, team capacity, and a named contact.",
           },
@@ -38,26 +39,40 @@ export function MethodologyContent() {
           </div>
         ))}
       </div>
-      <h3>A score is a starting point. Requirements come first.</h3>
+      <h3>Mandatory requirements gate the outcome.</h3>
       <div className="decision-rules">
         <p>
-          <span className="decision-badge pursue">Pursue</span>70+ with no unmet
-          mandatory requirement.
+          <span className="decision-badge ready">Ready to prepare a bid</span>
+          <span className="decision-rule-copy">
+            All mandatory items are verified against the declared company
+            profile.
+          </span>
         </p>
         <p>
-          <span className="decision-badge partner">Partner</span>45–69, or a
-          specialist gap a partner could address.
+          <span className="decision-badge review">
+            Fix gaps before committing proposal resources
+          </span>
+          <span className="decision-rule-copy">
+            At least one mandatory item has missing evidence or needs human
+            review.
+          </span>
         </p>
         <p>
-          <span className="decision-badge pass">Pass</span>Below 45, or any
-          clearly unmet mandatory requirement.
+          <span className="decision-badge blocker">
+            Do not commit proposal resources yet
+          </span>
+          <span className="decision-rule-copy">
+            A mandatory requirement fails a structured check against the
+            declared profile.
+          </span>
         </p>
       </div>
       <p className="fine-print">
-        “Needs evidence” means a claim still needs supporting material.
-        “Verified” means matched to your declared demo profile, not
-        independently certified. Missing references earn partial evidence
-        credit; they are never represented as verified references.
+        “Missing evidence” and “Needs human review” mean evidence or the
+        original tender must still be checked. “Verified” means matched to the
+        declared demo profile, not independently certified. A tender is never
+        marked “Ready to prepare a bid” while a mandatory item needs
+        verification.
       </p>
       <div className="source-disclosure">
         <FileText size={20} />
@@ -66,9 +81,9 @@ export function MethodologyContent() {
           <p>
             These 12 illustrative opportunities are modeled on public
             procurement notice structures. Titles, dates, tender numbers,
-            buyers, requirements, and section references are demo content, not
-            verified live solicitations. Portal links are entry points, not
-            links to matching records.
+            buyers, requirements, and Sample requirement references are demo
+            content, not verified live solicitations. Portal links are entry
+            points, not links to matching records.
           </p>
           <small>
             Dataset prepared {dateLabel(DATASET_DATE, true)}. No live notice

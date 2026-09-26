@@ -1,3 +1,4 @@
+import { defaultCompany } from "../../src/data/company";
 import { test, expect } from "@playwright/test";
 
 test("overview, tender analysis, bid plan, clipboard, and coach fallback", async ({
@@ -7,29 +8,36 @@ test("overview, tender analysis, bid plan, clipboard, and coach fallback", async
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.goto("/");
-  await expect(
-    page.locator(".summary-card").first().locator(".summary-value"),
-  ).toContainText("3");
-  await expect(page.locator(".readiness-ring")).toContainText("78");
-  await expect(page.locator(".opportunity-card")).toHaveCount(3);
-  await page.locator(".opportunity-card").first().click();
+  await page.goto("/overview");
+  await expect(page.getByRole("heading", { name: "Your next action" })).toBeVisible();
+  await expect(page.locator(".priority-card")).toContainText(
+    "Two mandatory items are not yet verified.",
+  );
+  await expect(page.locator(".other-check-row")).toHaveCount(3);
+  await expect(page.locator(".readiness-ring")).toHaveCount(0);
+  await page.getByRole("link", { name: "Review readiness check" }).click();
+  await expect(page).toHaveURL(/\/opportunities\/energy-retrofit$/);
   await expect(
     page.getByRole("heading", {
       name: "Energy Efficiency Retrofit Services",
       exact: true,
     }),
   ).toBeVisible();
-  await expect(page.locator(".hero-score")).toHaveText("86%");
-  await expect(page.locator(".requirement-status.needs_evidence")).toHaveCount(
-    1,
+  await expect(page.locator(".secondary-score > span")).toHaveText("83%");
+  await expect(
+    page.locator(".requirement-status.missing_evidence"),
+  ).toHaveCount(1);
+  await expect(page.locator(".readiness-outcome h2")).toHaveText(
+    "Fix gaps before committing proposal resources",
   );
-  await expect(page.locator(".analysis-decision h2")).toHaveText("Pursue");
-  await page.getByRole("button", { name: "Generate bid plan" }).click();
+  await page.getByRole("button", { name: "Create readiness plan" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   await expect(
-    dialog.getByRole("heading", { name: "Prepare evidence", exact: true }),
+    dialog.getByRole("heading", {
+      name: "Verify insurance evidence",
+      exact: true,
+    }),
   ).toBeVisible();
   await dialog.getByRole("button", { name: "Copy plan", exact: true }).click();
   await expect(
@@ -41,23 +49,24 @@ test("overview, tender analysis, bid plan, clipboard, and coach fallback", async
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Generate bid plan" }),
+    page.getByRole("button", { name: "Create readiness plan" }),
   ).toBeFocused();
   await page.locator(".action-list input").first().check();
   await expect(page.locator(".actions-panel .panel-footnote")).toContainText(
-    "1 of 4 complete",
+    "1 of 5 complete",
   );
-  await page.getByRole("button", { name: "Refresh analysis" }).click();
+  await page.getByRole("button", { name: "Refresh readiness check" }).click();
   await expect(page.locator(".coach-mode")).toContainText(
     "no API key required",
   );
   await expect(page.locator(".coach-body h3")).toHaveText(
-    "Strengthen the evidence, then pursue",
+    "Fix gaps before committing proposal resources",
   );
-  await page
-    .getByRole("button", { name: "Review against tender criteria" })
-    .click();
-  await expect(page.locator(".proposal-results")).toContainText("Tender §4.1");
+  await expect(
+    page.getByText(
+      "Proposal-response drafting begins only after all mandatory items are verified.",
+    ),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -81,11 +90,11 @@ test("search, all filter types, sorting, empty state and matching explanation", 
     ["Source", "Ontario Tenders"],
     ["Sector", "Clean energy"],
     ["Location", "Ontario"],
-    ["Decision", "pursue"],
+    ["Decision", "review"],
   ]) {
     await page.getByLabel(label, { exact: true }).selectOption(value);
   }
-  await expect(page.locator(".opportunity-row")).toHaveCount(2);
+  await expect(page.locator(".opportunity-row")).toHaveCount(3);
   await page.getByRole("button", { name: "Clear", exact: true }).click();
   await page.getByLabel("Sort opportunities").selectOption("closing");
   await expect(page.locator(".opportunity-row").first()).toContainText(
@@ -95,14 +104,14 @@ test("search, all filter types, sorting, empty state and matching explanation", 
   await expect(page.locator(".opportunity-row").first()).toContainText(
     "Sustainability Reporting Services",
   );
-  await page.getByRole("button", { name: "How matching works" }).click();
+  await page.getByRole("button", { name: "How readiness works" }).click();
   await expect(page.getByRole("dialog")).toContainText(
     "does not predict award outcomes",
   );
   await page.keyboard.press("Escape");
 });
 
-test("saved profile updates matching, survives reload, and can restore eligibility", async ({
+test("saved profile updates readiness, survives reload, and preserves human-review gate", async ({
   page,
 }) => {
   await page.goto("/profile");
@@ -110,7 +119,7 @@ test("saved profile updates matching, survives reload, and can restore eligibili
     .getByRole("button", { name: "Remove Ontario", exact: true })
     .click();
   await expect(page.locator(".profile-impact .decision-badge")).toHaveText(
-    "pass",
+    "Do not commit proposal resources yet",
   );
   await page
     .getByRole("button", { name: "Save changes", exact: true })
@@ -118,9 +127,13 @@ test("saved profile updates matching, survives reload, and can restore eligibili
     .click();
   await expect(page.getByRole("status")).toContainText("Your profile is saved");
   await page.goto("/opportunities/energy-retrofit");
-  await expect(page.locator(".analysis-decision h2")).toHaveText("Pass");
+  await expect(page.locator(".readiness-outcome h2")).toHaveText(
+    "Do not commit proposal resources yet",
+  );
   await page.reload();
-  await expect(page.locator(".analysis-decision h2")).toHaveText("Pass");
+  await expect(page.locator(".readiness-outcome h2")).toHaveText(
+    "Do not commit proposal resources yet",
+  );
   await page.goto("/profile");
   await page.getByLabel("Add regions served", { exact: true }).fill("Ontario");
   await page.getByLabel("Add regions served", { exact: true }).press("Enter");
@@ -137,13 +150,20 @@ test("saved profile updates matching, survives reload, and can restore eligibili
     .first()
     .click();
   await page.goto("/opportunities/energy-retrofit");
-  await expect(page.locator(".analysis-decision h2")).toHaveText("Pursue");
-  expect(
-    Number((await page.locator(".hero-score").innerText()).replace("%", "")),
-  ).toBeGreaterThan(86);
-  await expect(page.locator(".requirement-status.needs_evidence")).toHaveCount(
-    0,
+  await expect(page.locator(".readiness-outcome h2")).toHaveText(
+    "Fix gaps before committing proposal resources",
   );
+  expect(
+    Number(
+      (await page.locator(".secondary-score > span").innerText()).replace(
+        "%",
+        "",
+      ),
+    ),
+  ).toBeGreaterThan(83);
+  await expect(
+    page.locator(".requirement-status.missing_evidence"),
+  ).toHaveCount(0);
 });
 
 test("corrupted local storage and failed coach requests leave a usable workspace", async ({
@@ -153,11 +173,11 @@ test("corrupted local storage and failed coach requests leave a usable workspace
     localStorage.setItem("bidnorth.company.v1", "{invalid"),
   );
   await page.goto("/opportunities/energy-retrofit");
-  await expect(page.locator(".hero-score")).toHaveText("86%");
+  await expect(page.locator(".secondary-score > span")).toHaveText("83%");
   await page.route("**/api/bid-coach", (route) =>
     route.fulfill({ status: 503, body: "Unavailable" }),
   );
-  await page.getByRole("button", { name: "Refresh analysis" }).click();
+  await page.getByRole("button", { name: "Refresh readiness check" }).click();
   await expect(page.locator(".coach-mode")).toContainText(
     "Live analysis unavailable",
   );
@@ -168,7 +188,8 @@ for (const width of [1440, 768, 390])
   test(`responsive layout remains usable at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     for (const [path, label] of [
-      ["/", "overview"],
+      ["/overview", "overview"],
+      ["/about", "landing"],
       ["/opportunities", "opportunities"],
       ["/opportunities/energy-retrofit", "analysis"],
       ["/profile", "profile"],
@@ -193,7 +214,7 @@ for (const width of [1440, 768, 390])
         .getByRole("navigation")
         .getByRole("link", { name: "Overview", exact: true })
         .click();
-      await expect(page).toHaveURL("/");
+      await expect(page).toHaveURL("/overview");
     }
   });
 
@@ -210,4 +231,68 @@ test("bad API inputs and unknown opportunities are handled without a crash", asy
   await expect(
     page.getByRole("link", { name: "Browse opportunities" }),
   ).toBeVisible();
+});
+
+test("public CTA opens the fictional sample without overwriting a saved company", async ({
+  page,
+}) => {
+  await page.addInitScript(
+    (company) =>
+      localStorage.setItem("bidnorth.company.v1", JSON.stringify(company)),
+    { ...defaultCompany, name: "Saved company", certifications: [] },
+  );
+  await page.goto("/");
+  await expect(page).toHaveURL("/about");
+  await expect(page.locator(".sidebar")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", {
+      name: "Before you spend weeks bidding, know whether you are ready.",
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "See a sample readiness check", exact: true })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/energy-retrofit\?sample=1/);
+  await expect(page.locator(".readiness-outcome h2")).toHaveText(
+    "Fix gaps before committing proposal resources",
+  );
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem("bidnorth.company.v1")!).name,
+    ),
+  ).toBe("Saved company");
+  const security = page
+    .locator(".ledger-item")
+    .filter({ hasText: "Security/clearance requirement" });
+  await security.locator("summary").click();
+  await expect(
+    security.getByText("Why this status was assigned"),
+  ).toBeVisible();
+  await expect(
+    security.getByText(/The original tender remains authoritative/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Create readiness plan" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText("Owner: Maya Chen").first()).toBeVisible();
+  await dialog.getByRole("checkbox").first().check();
+  await expect(dialog.getByText("Complete", { exact: true })).toBeVisible();
+  await expect(dialog.getByRole("checkbox").last()).toBeDisabled();
+});
+
+test("public story reveals on scroll and respects reduced motion", async ({ page }) => {
+  await page.goto("/about");
+  const canada = page.locator(".story-canada .story-container");
+  await canada.scrollIntoViewIfNeeded();
+  await expect(canada).toHaveClass(/is-visible/);
+  await expect(page.locator("[data-count='66.9']")).toHaveText("$66.9B");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  const problem = page.locator(".story-problem .story-container");
+  await expect(problem).toBeVisible();
+  const duration = await page.locator(".story-hero-copy h1").evaluate(
+    (element) => getComputedStyle(element).animationDuration,
+  );
+  expect(parseFloat(duration)).toBeLessThan(0.1);
 });

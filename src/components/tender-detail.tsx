@@ -1,4 +1,7 @@
 "use client";
+import { defaultCompany } from "@/data/company";
+import { outcomeLabels } from "@/lib/readiness";
+import { METHODOLOGY } from "@/data/tenders";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
@@ -16,21 +19,31 @@ import {
 import type { Tender } from "@/types/procurement";
 import { useCompany } from "./company-provider";
 import { calculateMatch } from "@/lib/matching";
-import { dateLabel, deadlineLabel } from "@/lib/utils";
+import { dateLabel } from "@/lib/utils";
 import { DATASET_DATE } from "@/data/tenders";
-import { DecisionBadge, MetricBar } from "./ui";
+import { DecisionBadge } from "./ui";
 import { RequirementsList } from "./requirements-list";
 import { BidCoach } from "./bid-coach";
 import { BidPlanDrawer } from "./bid-plan-drawer";
 import { ProposalReview } from "./proposal-review";
-export function TenderDetail({ tender }: { tender: Tender }) {
-  const { company } = useCompany();
+export function TenderDetail({
+  tender,
+  sample = false,
+}: {
+  tender: Tender;
+  sample?: boolean;
+}) {
+  const { company: savedCompany } = useCompany();
+  const company = sample ? defaultCompany : savedCompany;
   const match = useMemo(
     () => calculateMatch(company, tender),
     [company, tender],
   );
   const [plan, setPlan] = useState(false);
   const [done, setDone] = useState<string[]>([]);
+  const completedActions = match.nextActions.filter((a) =>
+    done.includes(a.id),
+  ).length;
   return (
     <>
       <div className="detail-breadcrumb">
@@ -46,7 +59,12 @@ export function TenderDetail({ tender }: { tender: Tender }) {
           <div className="tender-eyebrow">
             <DecisionBadge decision={match.decision} />
             <span>{tender.sector}</span>
-            <span className="demo-label">Demo opportunity</span>
+            <span className="demo-label">Demo tender record</span>
+            {sample && (
+              <span className="demo-label">
+                Fictional sample company · saved profile unchanged
+              </span>
+            )}
           </div>
           <h1>{tender.title}</h1>
           <p>{tender.buyer}</p>
@@ -66,11 +84,18 @@ export function TenderDetail({ tender }: { tender: Tender }) {
               Closes {dateLabel(tender.closingDate, true)}
             </span>
           </div>
+          <div className="package-metadata">
+            <span>Tender number: {tender.tenderNumber}</span>
+            <span>
+              Sample package: v1 · {dateLabel(tender.publishedDate, true)}
+            </span>
+            <span>Last reviewed: {DATASET_DATE} · 09:00 ET (demo review)</span>
+          </div>
         </div>
         <div className="tender-header-actions">
           <button className="button primary" onClick={() => setPlan(true)}>
             <Sparkles size={16} />
-            Generate bid plan
+            Create readiness plan
           </button>
           <a
             className="button secondary"
@@ -78,80 +103,31 @@ export function TenderDetail({ tender }: { tender: Tender }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            View original tender
+            Open official tender portal
             <ArrowUpRight size={16} />
           </a>
           <small>Opens official portal · demo record</small>
         </div>
       </div>
-      <section className={`analysis-hero ${match.decision}`}>
-        <div className="analysis-main">
-          <div className="analysis-eyebrow">
-            <span className="small-dot" />
-            YOUR FIT ASSESSMENT
-          </div>
-          <div className="analysis-score-line">
-            <div className="hero-score">
-              {match.score}
-              <span>%</span>
-            </div>
-            <div>
-              <h2>
-                {match.decision === "pursue"
-                  ? "Strong fit"
-                  : match.decision === "partner"
-                    ? "Potential with a partner"
-                    : "Reconsider this opportunity"}
-              </h2>
-              <p>for {company.name}</p>
-            </div>
-          </div>
-          <p className="analysis-summary">{match.summary}</p>
-          <div className="metrics-grid">
-            <MetricBar label="Service fit" value={match.serviceFit} />
-            <MetricBar label="Eligibility" value={match.eligibility} />
-            <MetricBar label="Project evidence" value={match.projectEvidence} />
-            <MetricBar label="Operational fit" value={match.operationalFit} />
-          </div>
-          <Link className="score-methodology" href="/methodology">
-            How this score is calculated
-            <ArrowUpRight size={12} />
-          </Link>
+      <section className={`readiness-outcome ${match.decision}`}>
+        <div>
+          <span className="eyebrow">PRE-BID READINESS · {company.name}</span>
+          <h2>{outcomeLabels[match.decision]}</h2>
+          <p>{match.summary}</p>
+          <a className="text-link" href="#readiness-ledger">
+            Inspect the Readiness Ledger <ArrowRight size={16} />
+          </a>
         </div>
-        <div className="analysis-decision">
-          <div className="decision-icon">
-            <ShieldCheck size={23} />
-          </div>
-          <span className="eyebrow">RECOMMENDED DECISION</span>
-          <h2>{match.decision[0].toUpperCase() + match.decision.slice(1)}</h2>
-          <strong>
-            {match.decision === "pursue"
-              ? "A good opportunity to move forward."
-              : match.decision === "partner"
-                ? "The right partner can close the gap."
-                : "Address mandatory gaps first."}
-          </strong>
-          <p>
-            {match.decision === "pursue"
-              ? "Your core qualifications align. Strengthen your supporting evidence before committing to a response."
-              : match.summary}
-          </p>
-          <div className="decision-deadline">
-            <CalendarDays size={15} />
-            {deadlineLabel(tender.closingDate)}
-          </div>
-          <button
-            className="button decision-button"
-            onClick={() => setPlan(true)}
-          >
-            Start bid plan
-            <ArrowRight size={16} />
-          </button>
+        <div className="secondary-score">
+          <span>{match.score}%</span>
+          <small>Supporting readiness score</small>
+          <Link href="/methodology">How this is assessed</Link>
         </div>
       </section>
+      <RequirementsList tender={tender} match={match} company={company} />
+      <p className="readiness-disclaimer">{METHODOLOGY}</p>
       <div className="detail-grid">
         <div className="detail-main">
-          <RequirementsList tender={tender} match={match} />
           <section className="panel evaluation-panel">
             <div className="panel-heading">
               <h2>Evaluation priorities</h2>
@@ -177,7 +153,7 @@ export function TenderDetail({ tender }: { tender: Tender }) {
             <div className="panel-heading">
               <h2>
                 Why this is{" "}
-                {match.decision === "pass" ? "not yet a fit" : "a fit"}
+                {match.decision === "blocker" ? "blocked" : "ready for review"}
               </h2>
               <Sparkles size={17} />
             </div>
@@ -190,20 +166,27 @@ export function TenderDetail({ tender }: { tender: Tender }) {
               ))}
             </ul>
           </section>
-          <ProposalReview tender={tender} />
+          {match.decision === "ready" ? (
+            <ProposalReview tender={tender} />
+          ) : (
+            <p className="readiness-disclaimer">
+              Proposal-response drafting begins only after all mandatory items
+              are verified.
+            </p>
+          )}
         </div>
         <div className="detail-aside">
           <section className="panel actions-panel">
             <div className="panel-heading">
               <h2>Next actions</h2>
               <span className="panel-meta">
-                {done.length} of {match.nextActions.length}
+                {completedActions} of {match.nextActions.length}
               </span>
             </div>
             <div className="actions-progress">
               <span
                 style={{
-                  width: `${(done.length / match.nextActions.length) * 100}%`,
+                  width: `${(completedActions / match.nextActions.length) * 100}%`,
                 }}
               />
             </div>
@@ -216,6 +199,7 @@ export function TenderDetail({ tender }: { tender: Tender }) {
                   <input
                     type="checkbox"
                     checked={done.includes(a.id)}
+                    disabled={a.id === "4-0" && match.decision !== "ready"}
                     onChange={() =>
                       setDone((prev) =>
                         prev.includes(a.id)
@@ -225,21 +209,23 @@ export function TenderDetail({ tender }: { tender: Tender }) {
                     }
                   />
                   <span>
-                    <small>{a.timing}</small>
+                    <small>
+                      {a.timing} · Owner: {a.owner}
+                    </small>
                     <span>{a.title}</span>
                   </span>
                 </label>
               ))}
             </div>
             <div className="panel-footnote">
-              {done.length} of {match.nextActions.length} complete · this
+              {completedActions} of {match.nextActions.length} complete · this
               session
             </div>
           </section>
           <BidCoach company={company} tender={tender} match={match} />
           <section className="panel tender-source">
             <div className="panel-heading">
-              <h2>Tender source</h2>
+              <h2>Original tender check</h2>
               <FileText size={17} />
             </div>
             <div className="panel-body">
@@ -267,6 +253,8 @@ export function TenderDetail({ tender }: { tender: Tender }) {
         company={company}
         tender={tender}
         match={match}
+        completed={done}
+        setCompleted={setDone}
       />
     </>
   );

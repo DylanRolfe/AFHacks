@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ArrowUpRight,
   Building2,
   ChevronDown,
   Compass,
@@ -27,16 +26,17 @@ export function Logo() {
   );
 }
 const links = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
-  { href: "/opportunities", label: "Opportunities", icon: Compass },
+  { href: "/overview", label: "Overview", icon: LayoutDashboard },
+  { href: "/opportunities", label: "Tender checks", icon: Compass },
   { href: "/profile", label: "Company profile", icon: Building2 },
 ];
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { company } = useCompany();
   const [open, setOpen] = useState(false);
+  if (path === "/about" || path === "/") return <>{children}</>;
   const section = path.startsWith("/opportunities")
-    ? "Opportunities"
+    ? "Tender checks"
     : path === "/profile"
       ? "Company profile"
       : path === "/methodology"
@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className={`sidebar ${open ? "is-open" : ""}`}>
         <div className="sidebar-brand">
           <Link
-            href="/"
+            href="/overview"
             onClick={() => setOpen(false)}
             aria-label="BidNorth overview"
           >
@@ -83,7 +83,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </span>
           <ChevronDown size={14} />
         </Link>
-        <div className="nav-eyebrow">WORKSPACE</div>
         <nav aria-label="Main navigation">
           {links.map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? path === "/" : path.startsWith(href);
@@ -97,31 +96,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <Icon size={19} />
                 <span>{label}</span>
-                {href === "/opportunities" && (
-                  <span className="nav-count">12</span>
-                )}
               </Link>
             );
           })}
         </nav>
         <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <span className="tiny-star">
-              <Sparkle size={16} />
-            </span>
-            <strong>A clearer path to public work.</strong>
-            <p>The right opportunity starts with knowing where you fit.</p>
-            <Link href="/opportunities" onClick={() => setOpen(false)}>
-              Explore opportunities <ArrowUpRight size={14} />
-            </Link>
-          </div>
           <Link
             href="/methodology"
             className={`nav-link ${path === "/methodology" ? "active" : ""}`}
             onClick={() => setOpen(false)}
+            aria-current={path === "/methodology" ? "page" : undefined}
           >
             <BookOpen size={17} />
-            Sources & methodology
+            Methodology
           </Link>
           <div className="demo-workspace">
             <span />
@@ -172,12 +159,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <footer className="app-footer">
           <span>
             <span className="footer-maple">✦</span> Built for Canadian
-            businesses.
+            businesses. <Link href="/about#mission">Our mission</Link>
           </span>
           <span>
             Demo tender dataset <span className="footer-dot">·</span>{" "}
             <Link href="/methodology">
-              Transparent by design <ArrowUpRight size={12} />
+              Transparent by design
             </Link>
           </span>
         </footer>

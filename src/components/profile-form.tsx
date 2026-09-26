@@ -1,4 +1,5 @@
 "use client";
+import { outcomeLabels } from "@/lib/readiness";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -376,24 +377,24 @@ export function ProfileForm() {
             <div className="profile-impact">
               <span className="eyebrow">
                 <Sparkles size={13} />
-                LIVE MATCH PREVIEW
+                LIVE READINESS PREVIEW
               </span>
               <h4>{tenders[0].title}</h4>
               <div>
                 <strong>{match.score}%</strong>
                 <span className={`decision-badge ${match.decision}`}>
-                  {match.decision}
+                  {outcomeLabels[match.decision]}
                 </span>
               </div>
               <p>{match.summary}</p>
               <small>
                 {dirty
                   ? "Save changes to apply this assessment across your workspace."
-                  : "Changes to capabilities, coverage, and evidence update your matches."}
+                  : "Changes to capabilities, coverage, and evidence update your readiness checks."}
               </small>
             </div>
             <Link href="/opportunities" className="panel-footer-link">
-              Explore your matches
+              Explore tender checks
               <ArrowRight size={15} />
             </Link>
           </section>

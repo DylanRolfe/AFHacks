@@ -16,11 +16,14 @@ export async function generateMetadata({
 }
 export default async function TenderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ sample?: string }>;
 }) {
+  const sample = (await searchParams).sample === "1";
   const { id } = await params;
   const tender = tenders.find((t) => t.id === id);
   if (!tender) notFound();
-  return <TenderDetail tender={tender} />;
+  return <TenderDetail tender={tender} sample={sample} />;
 }

@@ -1,3 +1,4 @@
+import { outcomeLabels } from "@/lib/readiness";
 import { ArrowRight, Check, CircleHelp, SearchX } from "lucide-react";
 import Link from "next/link";
 import type { Decision } from "@/types/procurement";
@@ -5,7 +6,7 @@ export function DecisionBadge({ decision }: { decision: Decision }) {
   return (
     <span className={`decision-badge ${decision}`}>
       <span className="status-dot" />
-      {decision[0].toUpperCase() + decision.slice(1)}
+      {outcomeLabels[decision]}
     </span>
   );
 }

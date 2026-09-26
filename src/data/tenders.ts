@@ -2,7 +2,7 @@ import type { Tender, TenderRequirement } from "@/types/procurement";
 
 export const DATASET_DATE = "2026-09-26";
 export const METHODOLOGY =
-  "BidNorth assesses fit and bid readiness using the information in your profile and the tender record. It does not predict award outcomes or replace review of the original procurement documents.";
+  "BidNorth assesses documented readiness using the company profile and tender record. It does not predict award outcomes or replace review of official procurement documents, amendments, deadlines, and submission instructions.";
 const registration: TenderRequirement = {
   id: "registration",
   text: "Ontario business registration",
@@ -117,6 +117,13 @@ export const tenders: Tender[] = [
         },
         coverage,
         {
+          id: "security",
+          text: "Security/clearance requirement",
+          mandatory: true,
+          sourceReference: "Tender §3.6 — security schedule",
+          kind: "security",
+        },
+        {
           id: "methodology",
           text: "Carbon-reduction measurement methodology",
           mandatory: false,
@@ -198,7 +205,7 @@ export const tenders: Tender[] = [
       keywords: ["analytics", "public sector", "governance", "climate"],
       projectTags: ["analytics", "public sector"],
       strategicGap:
-        "Add a climate-science and data-governance partner to strengthen the specialist approach.",
+        "Verify climate-science and data-governance capability before committing proposal resources.",
       idealTeamSize: 65,
       requirements: [
         insurance,
@@ -230,7 +237,7 @@ export const tenders: Tender[] = [
       idealTeamSize: 60,
       comparableProjects: 3,
       strategicGap:
-        "Identify a licensed electrical delivery partner for charging-system installation.",
+        "Verify licensed electrical installation capability before committing proposal resources.",
     },
     3,
   ),
@@ -383,7 +390,7 @@ export const tenders: Tender[] = [
       projectTags: ["energy", "utility"],
       idealTeamSize: 75,
       strategicGap:
-        "Bring in a solar-engineering partner to address interconnection and array design.",
+        "Verify solar-engineering capability for interconnection and array design before proposal work.",
     },
     8,
   ),

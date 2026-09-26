@@ -1,3 +1,5 @@
+import { createBidPlan } from "./bid-plan";
+import { outcomeLabels } from "./readiness";
 import type {
   CoachInsight,
   CompanyProfile,
@@ -10,20 +12,17 @@ export function getFallbackInsight(
   match: MatchResult,
 ): CoachInsight {
   const blocked = tender.requirements.filter(
-    (r) => r.mandatory && match.requirementStatuses[r.id] === "not_met",
+    (r) => r.mandatory && match.requirementStatuses[r.id] === "hard_blocker",
   );
   return {
-    headline:
-      match.decision === "pass"
-        ? "Resolve the blockers before committing"
-        : match.decision === "partner"
-          ? "Build the right partnership first"
-          : "Strengthen the evidence, then pursue",
-    assessment: `${company.name}: ${match.summary} ${blocked.length ? `Review ${blocked.map((r) => r.sourceReference).join(", ")} in the complete notice.` : tender.aiFallbackInsight}`,
-    priorityActions: match.nextActions.slice(0, 3).map((a) => a.title),
+    headline: outcomeLabels[match.decision],
+    assessment: `${company.name}: ${match.summary} ${blocked.length ? `Check ${blocked.map((r) => `Sample requirement reference ${r.sourceReference}`).join(", ")} in the original tender.` : "Confirm the verified items against the original tender before beginning proposal work."}`,
+    priorityActions: createBidPlan(company, tender, match)
+      .slice(0, 3)
+      .map((p) => p.tasks[0]),
     watchouts: [
-      "Verify the complete solicitation package; the records and section references shown here are illustrative.",
-      "Do not submit until mandatory evidence has been reviewed internally.",
+      "This is a Demo tender record. Sample requirement references are not citations to a live solicitation.",
+      "Do not begin proposal work until every mandatory item is verified in the original tender.",
     ],
   };
 }

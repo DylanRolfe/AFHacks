@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       parsed.data,
       tender,
       match,
-      process.env.OPENAI_API_KEY,
+      process.env.DEEPSEEK_API_KEY,
     );
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store" },

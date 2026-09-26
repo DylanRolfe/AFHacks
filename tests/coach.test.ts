@@ -27,34 +27,22 @@ test("no API key produces useful deterministic guidance without any network call
     getFallbackInsight(defaultCompany, tender, match),
   );
 });
-test("configured coach requests the named model with strict structured outputs", async () => {
-  const insight = {
-    headline: "Strengthen evidence, then pursue",
-    assessment:
-      "Review the supporting evidence. Confirm the complete tender before drafting.",
-    priorityActions: [
-      "Prepare references",
-      "Confirm insurance",
-      "Draft approach",
-    ],
-    watchouts: ["Verify official notice", "Review mandatory evidence"],
-  };
+test("configured coach requests DeepSeek with JSON output", async () => {
+  const insight = getFallbackInsight(defaultCompany, tender, match);
   const mock: typeof fetch = async (url, init) => {
-    assert.equal(url, "https://api.openai.com/v1/responses");
+    assert.equal(url, "https://api.deepseek.com/chat/completions");
+    assert.equal(
+      new Headers(init?.headers).get("authorization"),
+      "Bearer test-key",
+    );
     const body = JSON.parse(String(init?.body));
-    assert.equal(body.model, "gpt-6-astra");
-    assert.equal(body.text.format.strict, true);
-    assert.equal(body.store, false);
+    assert.equal(body.model, "deepseek-flash");
+    assert.deepEqual(body.thinking, { type: "disabled" });
+    assert.deepEqual(body.response_format, { type: "json_object" });
+    assert.match(body.messages[0].content, /JSON Schema/);
     assert.ok(init?.signal);
     return Response.json({
-      status: "completed",
-      output: [
-        { type: "reasoning" },
-        {
-          type: "message",
-          content: [{ type: "output_text", text: JSON.stringify(insight) }],
-        },
-      ],
+      choices: [{ message: { content: JSON.stringify(insight) } }],
     });
   };
   const result = await generateCoach(
@@ -67,27 +55,18 @@ test("configured coach requests the named model with strict structured outputs",
   assert.equal(result.mode, "ai");
   assert.deepEqual(result.insight, insight);
 });
-test("malformed JSON, refusal, HTTP errors, network errors and timeout all fall back", async () => {
+test("malformed JSON, empty responses, HTTP errors, network errors and timeout all fall back", async () => {
   const responses: Array<typeof fetch> = [
     async () => Response.json({}, { status: 429 }),
     async () =>
       Response.json({
-        status: "completed",
-        output: [
-          {
-            type: "message",
-            content: [{ type: "output_text", text: "not json" }],
-          },
-        ],
+        choices: [{ message: { content: "not json" } }],
       }),
     async () =>
       Response.json({
-        status: "completed",
-        output: [
-          { type: "message", content: [{ type: "refusal", refusal: "No" }] },
-        ],
+        choices: [{ message: { content: null } }],
       }),
-    async () => Response.json({ status: "incomplete", output: [] }),
+    async () => Response.json({ choices: [] }),
     async () => {
       throw new Error("Network error");
     },
@@ -114,8 +93,8 @@ test("fallback does not claim eligibility after a profile loses mandatory qualif
   const company = { ...defaultCompany, certifications: [] };
   const m = calculateMatch(company, tender);
   const insight = getFallbackInsight(company, tender, m);
-  assert.match(insight.headline, /blockers/);
-  assert.match(insight.assessment, /Mandatory gap/);
+  assert.match(insight.headline, /Do not commit proposal resources yet/);
+  assert.match(insight.assessment, /Hard stop/);
   assert.doesNotMatch(insight.assessment, /meets the mandatory/);
 });
 test("API rejects malformed, oversized and unknown-tender requests safely", async () => {
@@ -138,4 +117,28 @@ test("API rejects malformed, oversized and unknown-tender requests safely", asyn
     }),
   );
   assert.equal(large.status, 413);
+});
+
+test("syntactically valid invented advice and eligibility claims are rejected", async () => {
+  const insight = {
+    ...getFallbackInsight(defaultCompany, tender, match),
+    assessment:
+      "You are legally eligible and will win. Obtain certification XYZ by October 1.",
+  };
+  const mock: typeof fetch = async () =>
+    Response.json({
+      choices: [{ message: { content: JSON.stringify(insight) } }],
+    });
+  const result = await generateCoach(
+    defaultCompany,
+    tender,
+    match,
+    "test",
+    mock,
+  );
+  assert.equal(result.mode, "fallback");
+  assert.deepEqual(
+    result.insight,
+    getFallbackInsight(defaultCompany, tender, match),
+  );
 });

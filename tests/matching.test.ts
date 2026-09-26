@@ -6,38 +6,57 @@ import { calculateMatch, profileReadiness } from "../src/lib/matching";
 import { daysUntil, reviewDate } from "../src/lib/utils";
 import { formatBidPlan } from "../src/lib/bid-plan";
 
-test("the curated profile produces transparent target scores and decisions", () => {
-  const expected = [
-    [86, "pursue"],
-    [79, "pursue"],
-    [68, "partner"],
-    [62, "partner"],
-    [37, "pass"],
-    [22, "pass"],
-    [74, "pursue"],
-    [71, "pursue"],
-    [66, "partner"],
-    [41, "pass"],
-    [83, "pursue"],
-    [73, "pursue"],
-  ];
-  tenders.forEach((t, i) => {
-    const m = calculateMatch(defaultCompany, t);
-    assert.deepEqual([m.score, m.decision], expected[i], t.id);
-    assert.ok(m.reasons.length >= 2);
-    assert.equal(
-      Object.keys(m.requirementStatuses).length,
-      t.requirements.length,
-    );
-  });
+test("sample has two mandatory gaps with distinct evidence and human-review statuses", () => {
+  const result = calculateMatch(defaultCompany, tenders[0]);
+  assert.equal(result.decision, "review");
+  assert.equal(result.requirementStatuses.registration, "verified");
+  assert.equal(result.requirementStatuses.insurance, "verified");
+  assert.equal(result.requirementStatuses.projects, "missing_evidence");
+  assert.equal(result.requirementStatuses.security, "human_review");
   assert.equal(
-    tenders.filter((t) => {
-      const m = calculateMatch(defaultCompany, t);
-      return m.score >= 79 && m.decision === "pursue";
-    }).length,
-    3,
+    result.summary,
+    "Two mandatory items are not yet verified. Resolve these gaps before assigning proposal-writing time.",
   );
-  assert.equal(profileReadiness(defaultCompany), 78);
+});
+test("all mandatory checks verified is ready even with a low supporting score", () => {
+  const tender = { ...tenders[0], requirements: [tenders[0].requirements[0]] };
+  const result = calculateMatch(
+    { ...defaultCompany, capabilities: [], projects: [], employeeCount: 1 },
+    tender,
+  );
+  assert.ok(result.score < 70);
+  assert.equal(result.decision, "ready");
+});
+test("optional gaps cannot block verified mandatory requirements", () => {
+  const tender = {
+    ...tenders[0],
+    requirements: [
+      tenders[0].requirements[0],
+      {
+        ...tenders[0].requirements.find((r) => r.kind === "security")!,
+        mandatory: false,
+      },
+    ],
+  };
+  assert.equal(calculateMatch(defaultCompany, tender).decision, "ready");
+});
+test("unknown requirement checks require human review instead of default verification", () => {
+  const tender = {
+    ...tenders[0],
+    requirements: [
+      {
+        id: "unknown",
+        text: "Check original terms",
+        mandatory: true,
+        sourceReference: "Sample annex",
+      },
+    ],
+  };
+  assert.equal(
+    calculateMatch(defaultCompany, tender).requirementStatuses.unknown,
+    "human_review",
+  );
+  assert.equal(calculateMatch(defaultCompany, tender).decision, "review");
 });
 test("an unmet mandatory registration or geography overrides a high fit score", () => {
   for (const company of [
@@ -50,9 +69,9 @@ test("an unmet mandatory registration or geography overrides a high fit score", 
     { ...defaultCompany, regions: ["Québec"] },
   ]) {
     const result = calculateMatch(company, tenders[0]);
-    assert.equal(result.decision, "pass");
-    assert.ok(result.score < 86);
-    assert.match(result.summary, /Mandatory gap/);
+    assert.equal(result.decision, "blocker");
+    assert.ok(result.score < 85);
+    assert.match(result.summary, /Hard stop/);
   }
 });
 test("insurance limits and expiry affect mandatory eligibility", () => {
@@ -61,19 +80,19 @@ test("insurance limits and expiry affect mandatory eligibility", () => {
       { ...defaultCompany, insuranceCoverageMillions: 1 },
       tenders[0],
     ).requirementStatuses.insurance,
-    "not_met",
+    "hard_blocker",
   );
   assert.equal(
     calculateMatch(
       { ...defaultCompany, insuranceExpiry: "2026-01-01" },
       tenders[0],
     ).decision,
-    "pass",
+    "blocker",
   );
   assert.equal(
     calculateMatch({ ...defaultCompany, insuranceExpiry: "" }, tenders[0])
       .requirementStatuses.insurance,
-    "needs_evidence",
+    "missing_evidence",
   );
 });
 test("capability edits lower service fit and evidence preparation raises the score", () => {
@@ -94,7 +113,9 @@ test("capability edits lower service fit and evidence preparation raises the sco
   );
   assert.equal(ready.requirementStatuses.projects, "verified");
   assert.equal(ready.projectEvidence, 100);
-  assert.ok(ready.score > 86);
+  assert.equal(ready.decision, "review");
+  assert.equal(ready.requirementStatuses.security, "human_review");
+  assert.ok(ready.score > 85);
 });
 test("missing comparable projects never appear verified and fallback reasons stay grounded", () => {
   const result = calculateMatch(
@@ -102,7 +123,7 @@ test("missing comparable projects never appear verified and fallback reasons sta
     tenders[0],
   );
   assert.equal(result.projectEvidence, 0);
-  assert.equal(result.requirementStatuses.projects, "needs_evidence");
+  assert.equal(result.requirementStatuses.projects, "missing_evidence");
   assert.match(result.reasons[1], /^0 related projects/);
 });
 test("many unconfirmed descriptions cannot masquerade as verified references", () => {
@@ -111,6 +132,7 @@ test("many unconfirmed descriptions cannot masquerade as verified references", (
     projects: Array.from({ length: 20 }, (_, i) => ({
       ...defaultCompany.projects[0],
       id: String(i),
+      referenceReady: false,
     })),
   };
   assert.equal(calculateMatch(company, tenders[0]).projectEvidence, 62);
@@ -142,9 +164,38 @@ test("dates and exported plans use the actual tender deadline", () => {
     calculateMatch(defaultCompany, tenders[0]),
   );
   assert.match(text, /DEMO DATA/);
-  assert.match(text, /Qualify/);
-  assert.match(text, /Prepare evidence/);
-  assert.match(text, /Write response/);
-  assert.match(text, /Review & submit/);
+  assert.match(text, /Resolve mandatory risks/);
+  assert.match(text, /Verify insurance evidence/);
+  assert.match(text, /Only after all mandatory items are verified/);
+  assert.match(text, /Internal compliance review/);
   assert.match(text, /Tender §4.1/);
+});
+
+test("a project check cannot overwrite an existing mandatory hard stop", () => {
+  const tender = {
+    ...tenders[0],
+    requirements: [
+      {
+        ...tenders[0].requirements.find((r) => r.kind === "projects")!,
+        requiredCertifications: ["Required qualification"],
+      },
+    ],
+  };
+  const company = {
+    ...defaultCompany,
+    projects: defaultCompany.projects.map((p) => ({
+      ...p,
+      referenceReady: true,
+    })),
+  };
+  assert.equal(calculateMatch(company, tender).decision, "blocker");
+});
+test("copied plan includes owners, timing, completion, and the mandatory gate", () => {
+  const result = calculateMatch(defaultCompany, tenders[0]);
+  const text = formatBidPlan(defaultCompany, tenders[0], result, ["0-0"]);
+  assert.match(text, /Owner: Maya Chen/);
+  assert.match(text, /Within three days/);
+  assert.match(text, /\[x\] Confirm whether the security requirement applies/);
+  assert.match(text, /Only after all mandatory items are verified/);
+  assert.equal(result.decision, "review");
 });

@@ -10,12 +10,16 @@ export function BidPlanDrawer({
   company,
   tender,
   match,
+  completed,
+  setCompleted,
 }: {
   open: boolean;
   onClose: () => void;
   company: CompanyProfile;
   tender: Tender;
   match: MatchResult;
+  completed: string[];
+  setCompleted: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
@@ -23,7 +27,7 @@ export function BidPlanDrawer({
   async function copy() {
     try {
       await navigator.clipboard.writeText(
-        formatBidPlan(company, tender, match),
+        formatBidPlan(company, tender, match, completed),
       );
       setCopied(true);
       setCopyError(false);
@@ -36,12 +40,13 @@ export function BidPlanDrawer({
     <Dialog
       open={open}
       onClose={onClose}
-      title={`Bid plan for ${tender.title}`}
+      title={`Readiness plan for ${tender.title}`}
       drawer
     >
       <p className="dialog-description">
-        A practical path from fit assessment to a reviewed response. Assign
-        owners and confirm dates with your team.
+        A practical path to resolve or verify requirements before proposal work.
+        Suggested internal timing and owners; confirm details in the original
+        tender. Completing a task does not change the ledger status.
       </p>
       <div className="plan-owner">
         <ListChecks size={18} />
@@ -49,9 +54,9 @@ export function BidPlanDrawer({
           Prepared for <strong>{company.name}</strong>
         </span>
       </div>
-      {match.decision === "pass" && (
+      {match.decision !== "ready" && (
         <div className="blocker-note">
-          Resolve mandatory blockers before starting response work.
+          Fix or verify mandatory items before starting response work.
         </div>
       )}
       <div className="plan-phases">
@@ -65,10 +70,43 @@ export function BidPlanDrawer({
                 <h3>{p.title}</h3>
                 <small>{p.timing}</small>
               </div>
+              <p className="plan-task-owner">Owner: {p.owner}</p>
               <ul>
-                {p.tasks.map((task) => (
-                  <li key={task}>{task}</li>
-                ))}
+                {p.tasks.map((task, j) => {
+                  const id = `${i}-${j}`;
+                  return (
+                    <li key={task}>
+                      <label className="plan-task">
+                        <input
+                          type="checkbox"
+                          checked={completed.includes(id)}
+                          disabled={
+                            i === phases.length - 1 &&
+                            match.decision !== "ready"
+                          }
+                          onChange={() =>
+                            setCompleted((prev) =>
+                              prev.includes(id)
+                                ? prev.filter((v) => v !== id)
+                                : [...prev, id],
+                            )
+                          }
+                        />
+                        <span>
+                          {task}
+                          <small>
+                            {completed.includes(id)
+                              ? "Complete"
+                              : i === phases.length - 1 &&
+                                  match.decision !== "ready"
+                                ? "Waiting for mandatory verification"
+                                : "To do"}
+                          </small>
+                        </span>
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </section>
@@ -92,7 +130,7 @@ export function BidPlanDrawer({
               className="copy-fallback"
               aria-label="Plan text to copy"
               readOnly
-              value={formatBidPlan(company, tender, match)}
+              value={formatBidPlan(company, tender, match, completed)}
               onFocus={(e) => e.currentTarget.select()}
             />
           </div>
