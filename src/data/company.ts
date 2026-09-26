@@ -1,0 +1,55 @@
+import type { CompanyProfile } from "@/types/procurement";
+
+export const defaultCompany: CompanyProfile = {
+  name: "Northern Grid Solutions",
+  headquarters: "Kitchener-Waterloo, Ontario",
+  employeeCount: 18,
+  regions: ["Ontario", "Québec", "Atlantic Canada"],
+  capabilities: [
+    "Energy-management software",
+    "Building retrofits",
+    "Utility analytics",
+    "Project management",
+  ],
+  certifications: [
+    "SOC 2 Type II",
+    "Professional liability insurance",
+    "Ontario business registration",
+  ],
+  projects: [
+    {
+      id: "project-waterloo",
+      title: "Municipal energy analytics rollout",
+      clientType: "Waterloo Region utility",
+      year: 2025,
+      valueRange: "$500K–$1M",
+      outcome: "Reduced peak-energy consumption reporting time by 43%.",
+      tags: ["utility", "analytics", "Ontario", "energy"],
+      referenceReady: false,
+    },
+    {
+      id: "project-retrofit",
+      title: "Portfolio retrofit assessment",
+      clientType: "Ontario commercial real-estate portfolio",
+      year: 2024,
+      valueRange: "$250K–$500K",
+      outcome: "Identified a 21% projected reduction in energy intensity.",
+      tags: ["retrofit", "Ontario", "energy"],
+      referenceReady: false,
+    },
+    {
+      id: "project-analytics",
+      title: "Energy reporting platform implementation",
+      clientType: "Regional public agency",
+      year: 2023,
+      valueRange: "$100K–$250K",
+      outcome: "Unified reporting across 34 facilities.",
+      tags: ["software", "public sector", "analytics"],
+      referenceReady: false,
+    },
+  ],
+  insuranceExpiry: "2026-12-31",
+  insuranceCoverageMillions: 2,
+  procurementContact: "Maya Chen",
+  lastReviewed: "2026-09-26",
+};
