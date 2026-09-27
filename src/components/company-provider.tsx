@@ -14,6 +14,13 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
   const [company, setCompany] = useState<CompanyProfile>(defaultCompany);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
+    const videoDemo =
+      window.location.pathname === "/demo" ||
+      new URLSearchParams(window.location.search).get("demo") === "video";
+    if (videoDemo) {
+      setHydrated(true);
+      return;
+    }
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {

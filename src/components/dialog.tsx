@@ -21,7 +21,8 @@ export function Dialog({
     const dialog = ref.current;
     if (!dialog) return;
     if (open) {
-      dialog.showModal();
+      if (document.documentElement.classList.contains("video-demo-running")) dialog.show();
+      else dialog.showModal();
       const previous = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
@@ -46,6 +47,7 @@ export function Dialog({
           <span className="eyebrow">BIDNORTH WORKSPACE</span>
           <button
             className="icon-button"
+            data-demo="plan-close"
             aria-label="Close dialog"
             onClick={onClose}
           >

@@ -43,7 +43,7 @@ export function RequirementsList({
       : "No matching certification or capability is recorded in the company profile.";
   };
   return (
-    <section className="panel ledger" id="readiness-ledger">
+    <section className="panel ledger" id="readiness-ledger" data-demo="ledger">
       <div className="panel-heading">
         <div>
           <span className="eyebrow">EVIDENCE BEFORE EFFORT</span>
@@ -88,7 +88,7 @@ export function RequirementsList({
                 ? "The declared profile does not satisfy this requirement. A mandatory hard stop overrides the readiness score."
                 : "The profile does not contain sufficient prepared evidence to verify this item.";
         return (
-          <details className="ledger-item" key={r.id}>
+          <details className="ledger-item" data-demo={`requirement-${r.id}`} key={r.id}>
             <summary>
               <span className="ledger-requirement">
                 <strong>{r.text}</strong>
@@ -98,16 +98,16 @@ export function RequirementsList({
                 </small>
               </span>
               <span>
-                <span className={`requirement-status ${status}`}>
+                <span className={`requirement-status ${status}`} data-demo={`status-${r.id}`}>
                   {statusLabels[status]}
                 </span>
               </span>
               <span className="ledger-evidence">{evidenceFor(r)}</span>
-              <span className="ledger-source">
+              <span className="ledger-source" data-demo={`source-${r.id}`}>
                 <small>Sample requirement reference</small>
                 {r.sourceReference}
               </span>
-              <span className="ledger-action">{action}</span>
+              <span className="ledger-action" data-demo={`action-${r.id}`}>{action}</span>
             </summary>
             <div className="ledger-expanded">
               <div>
@@ -128,7 +128,7 @@ export function RequirementsList({
                 <h3>Recommended next action</h3>
                 <p>{action}</p>
               </div>
-              <p className="ledger-authority">
+              <p className="ledger-authority" data-demo={`authority-${r.id}`}>
                 The original tender remains authoritative. Verify the complete
                 package, amendments, deadlines, and submission instructions.
               </p>

@@ -36,6 +36,10 @@ export function StoryMotion() {
           if (!Number.isFinite(end)) continue;
           const prefix = element.dataset.prefix ?? "";
           const suffix = element.dataset.suffix ?? "";
+          if (root.classList.contains("video-demo-running")) {
+            element.textContent = prefix + end.toFixed(1) + suffix;
+            continue;
+          }
           const duration = 850;
           let start: number | undefined;
           const frame = (now: number) => {

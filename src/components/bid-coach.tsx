@@ -65,7 +65,7 @@ export function BidCoach({
     }
   }
   return (
-    <section className="panel coach-panel">
+    <section className="panel coach-panel" data-demo="coach">
       <div className="panel-heading">
         <h2>
           <Sparkles size={18} />
@@ -84,10 +84,10 @@ export function BidCoach({
           </div>
         ) : (
           <>
-            <span className="coach-mode">{mode}</span>
+            <span className="coach-mode" data-demo="coach-mode">{mode}</span>
             <h3>{insight.headline}</h3>
             <p>{insight.assessment}</p>
-            <ol>
+            <ol data-demo="coach-actions">
               {insight.priorityActions.map((action) => (
                 <li key={action}>{action}</li>
               ))}
@@ -116,7 +116,7 @@ export function BidCoach({
           <RefreshCw size={14} className={loading ? "spin" : ""} />
           {loading ? "Reviewing readiness…" : "Refresh readiness check"}
         </button>
-        <p>
+        <p data-demo="coach-limits">
           Recommendations are based on your profile and the tender information
           shown. Verify all requirements in the source notice.
         </p>

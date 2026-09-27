@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { CompanyProvider } from "@/components/company-provider";
 import { AppShell } from "@/components/app-shell";
+import { VideoDemoController } from "@/components/video-demo-controller";
+import { Suspense } from "react";
 import "./globals.css";
 
 const inter = localFont({
@@ -27,6 +29,7 @@ export default function RootLayout({
       <body>
         <CompanyProvider>
           <AppShell>{children}</AppShell>
+          <Suspense fallback={null}><VideoDemoController /></Suspense>
         </CompanyProvider>
       </body>
     </html>

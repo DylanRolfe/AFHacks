@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { company } = useCompany();
   const [open, setOpen] = useState(false);
-  if (path === "/about" || path === "/") return <>{children}</>;
+  if (path === "/about" || path === "/demo" || path === "/") return <>{children}</>;
   const section = path.startsWith("/opportunities")
     ? "Tender checks"
     : path === "/profile"

@@ -5708,7 +5708,8 @@ body {
 .story-headline-line {
   display: block;
   overflow: hidden;
-  padding: 0 0 0.06em;
+  /* Preserve descenders (notably the g in “edge”) while the line-rise animation is clipped. */
+  padding: 0 0 0.18em;
   color: #c0cee0;
   white-space: nowrap;
 }
@@ -5756,7 +5757,8 @@ body {
 .story-hero-visual {
   position: absolute;
   z-index: 1;
-  right: 0;
+  /* Keep the ledger clear of the oversized hero headline on desktop. */
+  right: clamp(-92px, -6vw, -32px);
   bottom: 24px;
   width: min(440px, 35vw);
   min-width: 340px;
@@ -6034,4 +6036,135 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .story-headline-line > span { transform: none; opacity: 1; }
   .story-manifesto-statement [data-manifesto-phrase] { color: #e5edfa; }
+}
+
+/* Timed recording mode. All selectors are inert outside /demo and ?demo=video. */
+.video-demo-route { display: contents; }
+html:is(.video-demo-idle, .video-demo-running) .story-page > :is(
+  .story-manifesto,
+  .story-proof-transition,
+  .story-problem
+) { display: none; }
+.story-product-link-demo { display: none; }
+html.video-demo-running .story-product-link-normal { display: none; }
+html.video-demo-running .story-product-link-demo { display: inline; }
+html.video-demo-running .story-canada-takeaway { display: none; }
+html.video-demo-idle .video-demo-route *,
+html.video-demo-idle .video-demo-route *::before,
+html.video-demo-idle .video-demo-route *::after {
+  animation: none !important;
+  transition: none !important;
+}
+html.video-demo-idle .video-demo-route .story-headline-line > span {
+  transform: none;
+  opacity: 1;
+}
+.video-demo-controls {
+  position: fixed;
+  z-index: 6000;
+  right: 22px;
+  bottom: 22px;
+  width: min(320px, calc(100vw - 32px));
+  padding: 16px 17px 15px;
+  border: 1px solid #b7cce8;
+  border-radius: 13px;
+  color: #193755;
+  background: #fffffff5;
+  box-shadow: 0 14px 48px #122b4830;
+  backdrop-filter: blur(12px);
+  font-family: var(--font-inter), sans-serif;
+}
+html.video-demo-closing .video-demo-controls { z-index: 8000; }
+.video-demo-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: #51769e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.video-demo-controls > strong {
+  display: block;
+  min-height: 38px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.video-demo-control-row { display: flex; align-items: center; gap: 8px; margin-top: 9px; }
+.video-demo-time { flex: 1; font-size: 12px; font-variant-numeric: tabular-nums; color: #58738e; }
+.video-demo-control-row button {
+  padding: 7px 10px;
+  border: 1px solid #204f90;
+  border-radius: 6px;
+  background: #204f90;
+  color: white;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.video-demo-control-row .video-demo-restart { background: transparent; color: #204f90; }
+.video-demo-control-row button:focus-visible { outline: 3px solid #72b0f1; outline-offset: 2px; }
+.video-demo-seek { display: flex; align-items: center; gap: 7px; margin-top: 11px; padding-top: 10px; border-top: 1px solid #d9e5f2; }
+.video-demo-seek label { flex: 1; color: #58738e; font-size: 11px; }
+.video-demo-seek input { width: 64px; padding: 6px 7px; border: 1px solid #a9bfd8; border-radius: 6px; color: #193755; background: white; font: inherit; font-size: 11px; font-variant-numeric: tabular-nums; }
+.video-demo-seek button { padding: 7px 10px; border: 1px solid #204f90; border-radius: 6px; color: #204f90; background: transparent; font: inherit; font-size: 11px; font-weight: 650; cursor: pointer; }
+.video-demo-seek :is(input, button):focus-visible { outline: 3px solid #72b0f1; outline-offset: 2px; }
+.video-demo-seek-error { display: block; margin-top: 6px; color: #a84439; font-size: 11px; }
+html.video-demo-running .video-demo-target {
+  border-radius: 7px;
+  outline: 2px solid #65a9f4;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 10px #67b3ff20, 0 0 34px #56a8ff50;
+  transition: outline-color .35s ease, box-shadow .35s ease;
+}
+html.video-demo-running [data-demo="hero-headline"].video-demo-target {
+  outline: none;
+  box-shadow: none;
+}
+html.video-demo-running :is([data-demo="canada"], [data-demo="roadmap"]).video-demo-target {
+  outline: none;
+  box-shadow: none;
+}
+html.video-demo-running [data-demo="hero-headline"].video-demo-target .story-headline-line > span {
+  text-shadow: 0 0 28px #71adff55;
+}
+html.video-demo-running .dialog.drawer[open] {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 5000;
+  overflow-y: auto;
+  box-shadow: -22px 0 65px #132d4550;
+}
+html.video-demo-running[data-video-plan-phase="0"] .plan-phases section:nth-child(n+2),
+html.video-demo-running[data-video-plan-phase="1"] .plan-phases section:nth-child(n+3),
+html.video-demo-running[data-video-plan-phase="2"] .plan-phases section:nth-child(n+4),
+html.video-demo-running[data-video-plan-phase="3"] .plan-phases section:nth-child(n+5) { display: none; }
+html.video-demo-running:has(.dialog.drawer[open]) .video-demo-controls { right: auto; left: 22px; }
+html.video-demo-running:has(.ledger.video-demo-target) .video-demo-controls,
+html.video-demo-running:has(.ledger .video-demo-target) .video-demo-controls { right: auto; left: 22px; }
+html.video-demo-running:has([data-demo="product-window"].video-demo-target) .video-demo-controls,
+html.video-demo-running:has([data-demo="product-cta"].video-demo-target) .video-demo-controls { right: auto; left: 22px; }
+.video-demo-end {
+  position: fixed;
+  z-index: 7000;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: radial-gradient(circle at 50% 38%, #1b426b, #102c4a 58%, #0a2139);
+  color: #fff;
+  text-align: center;
+  animation: video-demo-fade .75s ease both;
+}
+.video-demo-end-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 43px; font-size: 24px; font-weight: 700; letter-spacing: -.04em; }
+.video-demo-end-brand svg, .video-demo-end-brand span { color: #8bbdff; }
+.video-demo-end h1 { max-width: 900px; margin: 0; font-size: clamp(40px, 5vw, 74px); line-height: 1.08; letter-spacing: -.055em; }
+.video-demo-end p { max-width: 650px; margin: 22px 0 0; color: #c7d9ec; font-size: clamp(16px, 1.7vw, 22px); line-height: 1.5; }
+@keyframes video-demo-fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .video-demo-end { animation: none; }
+  html.video-demo-running .video-demo-target { transition: none; }
 }

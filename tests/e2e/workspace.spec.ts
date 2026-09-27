@@ -256,10 +256,10 @@ test("public CTA opens the fictional sample without overwriting a saved company"
   await page.goto("/");
   await expect(page).toHaveURL("/about");
   await expect(page.locator(".sidebar")).toHaveCount(0);
-  await expect(
-    page.getByRole("heading", {
-      name: "Before you commit to a proposal, know what you can prove.",
-    }),
+    await expect(
+      page.getByRole("heading", {
+        name: "Bid smarter. Find your edge.",
+      }),
   ).toBeVisible();
   await page
     .getByRole("link", { name: "See a sample readiness check", exact: true })

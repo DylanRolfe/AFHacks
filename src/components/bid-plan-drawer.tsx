@@ -55,13 +55,13 @@ export function BidPlanDrawer({
         </span>
       </div>
       {match.decision !== "ready" && (
-        <div className="blocker-note">
+      <div className="blocker-note" data-demo="plan-blocked">
           Fix or verify mandatory items before starting response work.
         </div>
       )}
       <div className="plan-phases">
         {phases.map((p, i) => (
-          <section key={p.title}>
+          <section key={p.title} data-demo={`plan-phase-${i}`}>
             <span className="phase-number">
               {String(i + 1).padStart(2, "0")}
             </span>

@@ -58,7 +58,7 @@ export default function AboutPage() {
     <main className="story-page">
       <StoryMotion />
 
-      <section className="story-hero" aria-labelledby="story-title">
+      <section className="story-hero" data-demo="about-hero" aria-labelledby="story-title">
         <div className="story-grid-art" aria-hidden="true" />
         <div className="story-hero-atmosphere" aria-hidden="true">
           <span>REQUIREMENT / §3.2 <i /></span>
@@ -79,19 +79,17 @@ export default function AboutPage() {
           <div className="story-hero-stage">
             <div className="story-hero-copy">
               <p className="story-eyebrow">PRE-BID READINESS FOR CANADIAN SMEs</p>
-              <h1 id="story-title" aria-label="Before you commit to a proposal, know what you can prove.">
-                <span className="story-headline-line"><span>Before you commit</span></span>
-                <span className="story-headline-line"><span>to a proposal,</span></span>
-                <span className="story-headline-line"><span>know what you</span></span>
-                <span className="story-headline-line story-headline-final"><span>can prove.</span></span>
+              <h1 id="story-title" data-demo="hero-headline" aria-label="Bid smarter. Find your edge.">
+                <span className="story-headline-line"><span>Bid smarter.</span></span>
+                <span className="story-headline-line story-headline-final"><span>Find your edge.</span></span>
               </h1>
-              <p className="story-hero-lead">
+              <p className="story-hero-lead" data-demo="hero-lead">
                 BidNorth turns tender requirements and company evidence into a
                 source-aware readiness decision-before a small business spends weeks
                 preparing a bid.
               </p>
               <div className="story-actions">
-                <Link className="story-button story-button-blue" href={sample}>
+                <Link className="story-button story-button-blue" data-demo="hero-cta" href={sample}>
                   See a sample readiness check <ArrowRight size={17} aria-hidden="true" />
                 </Link>
                 <a className="story-text-link" href="#mission">
@@ -99,11 +97,11 @@ export default function AboutPage() {
                 </a>
               </div>
             </div>
-            <div className="story-hero-visual" aria-label="Illustrative Bid Readiness Ledger">
+            <div className="story-hero-visual" data-demo="hero-ledger" aria-label="Illustrative Bid Readiness Ledger">
               <div className="story-hero-ledger">
                 <div className="story-hero-ledger-top">
                   <span className="story-ledger-kicker">BID READINESS LEDGER</span>
-                  <span className="story-ledger-number">DEMO · 01 / 04</span>
+                  <span className="story-ledger-number">SAMPLE · 01 / 04</span>
                 </div>
                 <div className="story-hero-ledger-title">
                   <p>Natural Resources Canada</p>
@@ -114,6 +112,7 @@ export default function AboutPage() {
                   {requirements.map((requirement) => (
                     <div
                       className={["story-hero-requirement", match.requirementStatuses[requirement.id]].join(" ")}
+                      data-demo={`hero-requirement-${requirement.id}`}
                       key={requirement.id}
                     >
                       <span className="story-hero-requirement-name">
@@ -135,7 +134,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-manifesto" id="mission" aria-labelledby="mission-title">
+      <section className="story-manifesto" id="mission" data-demo="mission" aria-labelledby="mission-title">
         <div className="story-grid-art" aria-hidden="true" />
         <div className="story-manifesto-fragments" aria-hidden="true">
           <span>§3.2 / MANDATORY</span><span>§4.1 / EVIDENCE</span><span>REVIEW REQUIRED</span>
@@ -143,12 +142,12 @@ export default function AboutPage() {
         <div className="story-manifesto-sticky">
           <div className="story-container">
             <p className="story-eyebrow">OUR MISSION</p>
-            <h2 id="mission-title">
+            <h2 id="mission-title" data-demo="mission-title">
               <span>READINESS</span>
               <span>REQUIRES</span>
               <span>PROOF.</span>
             </h2>
-            <p className="story-manifesto-statement">
+            <p className="story-manifesto-statement" data-demo="mission-statement">
               <span data-manifesto-phrase>We turn scattered tender requirements </span>
               <span data-manifesto-phrase>and fragmented company evidence </span>
               <span data-manifesto-phrase>into a clear, source-aware readiness ledger-</span>
@@ -160,7 +159,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-proof-transition" aria-label="From scattered requirements to an organized readiness decision">
+      <section className="story-proof-transition" data-demo="proof-transition" aria-label="From scattered requirements to an organized readiness decision">
         <div className="story-container story-transition-layout" data-reveal>
           <div className="story-transition-scattered" aria-hidden="true">
             <span>§3.2<br />Registration</span>
@@ -178,11 +177,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-problem" aria-labelledby="problem-title">
+      <section className="story-problem" data-demo="problem" aria-labelledby="problem-title">
         <div className="story-container story-problem-layout" data-reveal>
           <div>
             <p className="story-eyebrow story-eyebrow-blue">01 / THE COST OF A LATE DISCOVERY</p>
-            <h2 id="problem-title">The most expensive bid is the one a company was never ready to submit.</h2>
+            <h2 id="problem-title" data-demo="problem-title">The most expensive bid is the one a company was never ready to submit.</h2>
             <p className="story-section-lead">
               A promising opportunity can consume days of proposal work before a
               mandatory requirement is found that the business cannot prove.
@@ -213,22 +212,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-canada" aria-labelledby="canada-title">
+      <section className="story-canada" data-demo="canada" aria-labelledby="canada-title">
         <div className="story-grid-art" aria-hidden="true" />
         <div className="story-container" data-reveal>
           <p className="story-eyebrow">02 / THE CANADIAN OPPORTUNITY</p>
           <h2 id="canada-title">Public procurement is one of Canada’s largest customer markets.</h2>
           <div className="story-stats">
-            <div>
+            <div data-demo="canada-contracts">
               <strong data-count="66.9" data-prefix="$" data-suffix="B">$66.9B</strong>
               <span>Government of Canada contracts awarded in 2024–25.</span>
             </div>
-            <div>
+            <div data-demo="canada-smes">
               <strong data-count="63.6" data-suffix="%">63.6%</strong>
               <span>Share of Canada’s private-sector workforce employed by SMEs.</span>
             </div>
           </div>
-          <p className="story-canada-takeaway">
+          <p className="story-canada-takeaway" data-demo="canada-takeaway">
             SMEs account for only 20–30% of PSPC contract value. Making procurement
             easier to navigate can help capable Canadian businesses compete, grow, and hire.
           </p>
@@ -239,14 +238,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-discovery" aria-labelledby="discovery-title">
+      <section className="story-discovery" data-demo="discovery" aria-labelledby="discovery-title">
         <div className="story-container" data-reveal>
           <p className="story-eyebrow story-eyebrow-blue">03 / THE DECISION AFTER DISCOVERY</p>
-          <h2 id="discovery-title">Finding a tender is only the beginning.</h2>
+          <h2 id="discovery-title" data-demo="discovery-title">Finding a tender is only the beginning.</h2>
           <div className="story-bridge" aria-hidden="true">
             <span>Tender found</span><i /><ArrowRight size={21} /><span>Readiness proven</span>
           </div>
-          <div className="story-discovery-columns">
+          <div className="story-discovery-columns" data-demo="discovery-comparison">
             <div>
               <span className="story-column-index">01 / DISCOVER</span>
               <h3>Government portals</h3>
@@ -274,7 +273,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-product" aria-labelledby="product-title">
+      <section className="story-product" data-demo="product-preview" aria-labelledby="product-title">
         <div className="story-container" data-reveal>
           <div className="story-product-heading">
             <div>
@@ -283,7 +282,7 @@ export default function AboutPage() {
             </div>
             <p>Every status connects a requirement to company evidence, source context, and a next action.</p>
           </div>
-          <div className="story-product-window">
+          <div className="story-product-window" data-demo="product-window">
             <div className="story-window-chrome">
               <span><i /><i /><i /></span>
               <span>BIDNORTH / READINESS CHECK</span>
@@ -321,7 +320,11 @@ export default function AboutPage() {
             </div>
             <div className="story-product-footer">
               <span>Verify every critical result against the official tender package and amendments.</span>
-              <Link href={sample}>Open full sample <ArrowUpRight size={15} aria-hidden="true" /></Link>
+              <Link href={sample} data-demo="product-cta">
+                <span className="story-product-link-normal">Open full sample</span>
+                <span className="story-product-link-demo">See a sample readiness check</span>
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
             </div>
           </div>
           <div className="story-principles">
@@ -363,32 +366,32 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="story-future" id="vision" aria-labelledby="future-title">
+      <section className="story-future" id="vision" data-demo="roadmap" aria-labelledby="future-title">
         <div className="story-grid-art" aria-hidden="true" />
         <div className="story-container" data-reveal>
           <p className="story-eyebrow">06 / FROM PROTOTYPE TO NATIONAL IMPACT</p>
           <h2 id="future-title">Start with one high-risk decision. Build the supplier-readiness layer for Canada.</h2>
           <div className="story-roadmap">
             <div className="story-roadmap-line" aria-hidden="true" />
-            <article>
+            <article data-demo="roadmap-prototype">
               <span className="story-roadmap-dot" aria-hidden="true" />
               <span className="story-roadmap-stage">NOW · CURRENT PROTOTYPE</span>
               <h3>Hackathon Prototype</h3>
               <p>Source-aware ledger, company evidence check, readiness outcome, and action plan for a sample federal tender.</p>
             </article>
-            <article>
+            <article data-demo="roadmap-validation">
               <span className="story-roadmap-dot" aria-hidden="true" />
               <span className="story-roadmap-stage">NEXT · PLANNED VALIDATION</span>
               <h3>Validate With Real SMEs</h3>
               <p>Run 10 planned concierge reviews. Test requirement accuracy, decision time, and willingness to use the workflow again.</p>
             </article>
-            <article>
+            <article data-demo="roadmap-pilots">
               <span className="story-roadmap-dot" aria-hidden="true" />
               <span className="story-roadmap-stage">THEN · PLANNED PILOTS</span>
               <h3>Scale Through Trusted Channels</h3>
               <p>Pilot with chambers, small-business centres, incubators, and industry associations.</p>
             </article>
-            <article className="story-roadmap-north">
+            <article className="story-roadmap-north" data-demo="roadmap-north-star">
               <span className="story-roadmap-dot" aria-hidden="true" />
               <span className="story-roadmap-stage">NORTH STAR · LONG-TERM VISION</span>
               <h3>Procurement Readiness for Every Canadian SME</h3>
@@ -397,7 +400,7 @@ export default function AboutPage() {
           </div>
           <div className="story-north-star">
             <span>OUR NORTH STAR</span>
-            <p>Make public procurement a more accessible growth channel for the Canadian businesses building the country’s future.</p>
+            <p data-demo="roadmap-statement">Make public procurement a more accessible growth channel for the Canadian businesses building the country’s future.</p>
           </div>
           <div className="story-final">
             <div>

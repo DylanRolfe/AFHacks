@@ -66,7 +66,7 @@ export function TenderDetail({
               </span>
             )}
           </div>
-          <h1>{tender.title}</h1>
+          <h1 data-demo="tender-title">{tender.title}</h1>
           <p>{tender.buyer}</p>
           <div className="tender-metadata">
             <span>
@@ -93,7 +93,7 @@ export function TenderDetail({
           </div>
         </div>
         <div className="tender-header-actions">
-          <button className="button primary" onClick={() => setPlan(true)}>
+          <button className="button primary" data-demo="plan-open" onClick={() => setPlan(true)}>
             <Sparkles size={16} />
             Create readiness plan
           </button>
@@ -109,16 +109,16 @@ export function TenderDetail({
           <small>Opens official portal · demo record</small>
         </div>
       </div>
-      <section className={`readiness-outcome ${match.decision}`}>
+      <section className={`readiness-outcome ${match.decision}`} data-demo="outcome">
         <div>
           <span className="eyebrow">PRE-BID READINESS · {company.name}</span>
-          <h2>{outcomeLabels[match.decision]}</h2>
+          <h2 data-demo="decision">{outcomeLabels[match.decision]}</h2>
           <p>{match.summary}</p>
           <a className="text-link" href="#readiness-ledger">
             Inspect the Readiness Ledger <ArrowRight size={16} />
           </a>
         </div>
-        <div className="secondary-score">
+        <div className="secondary-score" data-demo="score">
           <span>{match.score}%</span>
           <small>Supporting readiness score</small>
           <Link href="/methodology">How this is assessed</Link>
