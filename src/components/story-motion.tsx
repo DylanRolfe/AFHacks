@@ -12,7 +12,10 @@ export function StoryMotion() {
     const root = document.documentElement;
     const revealTargets = document.querySelectorAll<HTMLElement>(".story-page [data-reveal]");
     const countTargets = document.querySelectorAll<HTMLElement>(".story-page [data-count]");
+    const manifesto = document.querySelector<HTMLElement>(".story-manifesto");
+    const phrases = manifesto?.querySelectorAll<HTMLElement>("[data-manifesto-phrase]");
     const frames = new Set<number>();
+    let manifestoFrame = 0;
     const revealObserver = new IntersectionObserver(
       (entries, observer) => {
         for (const entry of entries) {
@@ -52,10 +55,37 @@ export function StoryMotion() {
     root.classList.add("story-motion-ready");
     revealTargets.forEach((target) => revealObserver.observe(target));
     countTargets.forEach((target) => countObserver.observe(target));
+    const updateManifesto = () => {
+      manifestoFrame = 0;
+      if (!manifesto || !phrases?.length) return;
+      const rect = manifesto.getBoundingClientRect();
+      const mobile = window.matchMedia("(max-width: 760px)").matches;
+      const distance = mobile
+        ? rect.height + window.innerHeight
+        : Math.max(rect.height - window.innerHeight, 1);
+      const traveled = mobile ? window.innerHeight - rect.top : -rect.top;
+      const progress = Math.max(0, Math.min(traveled / distance, 1));
+      const active = Math.min(Math.floor(progress * phrases.length), phrases.length - 1);
+      manifesto.style.setProperty("--manifesto-progress", String(progress));
+      manifesto.style.setProperty("--manifesto-scale", String(1 - progress * 0.055));
+      phrases.forEach((phrase, index) => {
+        phrase.classList.toggle("is-active", index === active);
+        phrase.classList.toggle("is-past", index < active);
+      });
+    };
+    const scheduleManifesto = () => {
+      if (!manifestoFrame) manifestoFrame = requestAnimationFrame(updateManifesto);
+    };
+    window.addEventListener("scroll", scheduleManifesto, { passive: true });
+    window.addEventListener("resize", scheduleManifesto);
+    updateManifesto();
     return () => {
       root.classList.remove("story-motion-ready");
       revealObserver.disconnect();
       countObserver.disconnect();
+      window.removeEventListener("scroll", scheduleManifesto);
+      window.removeEventListener("resize", scheduleManifesto);
+      cancelAnimationFrame(manifestoFrame);
       frames.forEach((frame) => cancelAnimationFrame(frame));
     };
   }, []);

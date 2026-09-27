@@ -60,6 +60,12 @@ export default function AboutPage() {
 
       <section className="story-hero" aria-labelledby="story-title">
         <div className="story-grid-art" aria-hidden="true" />
+        <div className="story-hero-atmosphere" aria-hidden="true">
+          <span>REQUIREMENT / §3.2 <i /></span>
+          <span>04 / 12 <i /></span>
+          <span>EVIDENCE / §4.1 <i /></span>
+          <span>MANDATORY / §3.6 <i /></span>
+        </div>
         <div className="story-container">
           <nav className="story-nav" aria-label="Public navigation">
             <Link href="/about" className="story-brand" aria-label="BidNorth home">
@@ -70,30 +76,30 @@ export default function AboutPage() {
               Open workspace <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
           </nav>
-          <div className="story-hero-grid">
+          <div className="story-hero-stage">
             <div className="story-hero-copy">
               <p className="story-eyebrow">PRE-BID READINESS FOR CANADIAN SMEs</p>
-              <h1 id="story-title">Before you spend weeks bidding, know whether you are ready.</h1>
+              <h1 id="story-title" aria-label="Before you commit to a proposal, know what you can prove.">
+                <span className="story-headline-line"><span>Before you commit</span></span>
+                <span className="story-headline-line"><span>to a proposal,</span></span>
+                <span className="story-headline-line"><span>know what you</span></span>
+                <span className="story-headline-line story-headline-final"><span>can prove.</span></span>
+              </h1>
               <p className="story-hero-lead">
-                BidNorth catches missing evidence and disqualifiers before a small
-                business commits scarce time to a government proposal.
+                BidNorth turns tender requirements and company evidence into a
+                source-aware readiness decision-before a small business spends weeks
+                preparing a bid.
               </p>
               <div className="story-actions">
                 <Link className="story-button story-button-blue" href={sample}>
                   See a sample readiness check <ArrowRight size={17} aria-hidden="true" />
                 </Link>
-                <a className="story-text-link" href="#vision">
-                  Explore the vision <ArrowDown size={16} aria-hidden="true" />
+                <a className="story-text-link" href="#mission">
+                  Our mission <ArrowDown size={16} aria-hidden="true" />
                 </a>
               </div>
-              <p className="story-hero-note">
-                Built for Canadian businesses navigating public procurement.
-              </p>
             </div>
             <div className="story-hero-visual" aria-label="Illustrative Bid Readiness Ledger">
-              <div className="story-document-ghost" aria-hidden="true">
-                <span>NRCan / 2026</span><span>§ 03.2</span><span>§ 03.4</span><span>§ 04.1</span>
-              </div>
               <div className="story-hero-ledger">
                 <div className="story-hero-ledger-top">
                   <span className="story-ledger-kicker">BID READINESS LEDGER</span>
@@ -110,7 +116,10 @@ export default function AboutPage() {
                       className={["story-hero-requirement", match.requirementStatuses[requirement.id]].join(" ")}
                       key={requirement.id}
                     >
-                      <span>{shortNames[requirement.id]}</span>
+                      <span className="story-hero-requirement-name">
+                        <small>{requirement.sourceReference}</small>
+                        {shortNames[requirement.id]}
+                      </span>
                       <Status id={requirement.id} />
                     </div>
                   ))}
@@ -123,6 +132,49 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="story-scroll-cue" aria-hidden="true"><span /> SCROLL TO EXPLORE</div>
+        </div>
+      </section>
+
+      <section className="story-manifesto" id="mission" aria-labelledby="mission-title">
+        <div className="story-grid-art" aria-hidden="true" />
+        <div className="story-manifesto-fragments" aria-hidden="true">
+          <span>§3.2 / MANDATORY</span><span>§4.1 / EVIDENCE</span><span>REVIEW REQUIRED</span>
+        </div>
+        <div className="story-manifesto-sticky">
+          <div className="story-container">
+            <p className="story-eyebrow">OUR MISSION</p>
+            <h2 id="mission-title">
+              <span>READINESS</span>
+              <span>REQUIRES</span>
+              <span>PROOF.</span>
+            </h2>
+            <p className="story-manifesto-statement">
+              <span data-manifesto-phrase>We turn scattered tender requirements </span>
+              <span data-manifesto-phrase>and fragmented company evidence </span>
+              <span data-manifesto-phrase>into a clear, source-aware readiness ledger-</span>
+              <span data-manifesto-phrase>so Canadian SMEs can resolve gaps </span>
+              <span data-manifesto-phrase>before they commit to a bid.</span>
+            </p>
+            <div className="story-manifesto-progress" aria-hidden="true"><span /></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="story-proof-transition" aria-label="From scattered requirements to an organized readiness decision">
+        <div className="story-container story-transition-layout" data-reveal>
+          <div className="story-transition-scattered" aria-hidden="true">
+            <span>§3.2<br />Registration</span>
+            <span>§3.4<br />Insurance</span>
+            <span>§4.1<br />Project evidence</span>
+            <span>§3.6<br />Security review</span>
+          </div>
+          <div className="story-transition-arrow" aria-hidden="true"><ArrowRight size={24} /></div>
+          <div className="story-transition-ledger">
+            <div><span>ONE READINESS DECISION</span><strong>Evidence before effort.</strong></div>
+            <p><Check size={15} /> 2 requirements verified</p>
+            <p><span className="story-small-amber" /> 1 item needs evidence</p>
+            <p><span className="story-small-violet" /> 1 item needs human review</p>
+          </div>
         </div>
       </section>
 

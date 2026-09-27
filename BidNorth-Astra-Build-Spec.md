@@ -1,4 +1,4 @@
-# BidNorth — One-Shot Build Specification
+# BidNorth - One-Shot Build Specification
 
 **Purpose:** This document is the complete implementation brief for an AI coding agent. Build the project in one pass as a polished, demo-ready web application for a 24-hour hackathon.
 
@@ -101,7 +101,7 @@ If using the AI feature locally, the user creates `.env.local` from `.env.exampl
 
 ### Desired aesthetic
 
-The interface must feel like a credible, premium B2B product—not a hackathon mockup and not a neon “AI” dashboard.
+The interface must feel like a credible, premium B2B product-not a hackathon mockup and not a neon “AI” dashboard.
 
 Use the design language of modern, restrained product sites such as Linear, Ramp, Stripe, and Vercel as directional inspiration only. Do not copy logos, assets, layouts, or proprietary design elements.
 
@@ -175,7 +175,7 @@ The sidebar must not dominate the screen. Use a white surface, light right borde
 
 ---
 
-### Page A — Overview dashboard (`/`)
+### Page A - Overview dashboard (`/`)
 
 #### Goal
 
@@ -195,9 +195,9 @@ Right-side primary button: `Update company profile`
 
 Three compact cards:
 
-1. `3` — Strong opportunities — `Ready to pursue this month`
-2. `2` — Readiness gaps — `Evidence or qualifications to address`
-3. `11 days` — Next closing date — `Energy retrofit services`
+1. `3` - Strong opportunities - `Ready to pursue this month`
+2. `2` - Readiness gaps - `Evidence or qualifications to address`
+3. `11 days` - Next closing date - `Energy retrofit services`
 
 #### Main dashboard body
 
@@ -218,10 +218,10 @@ Display the top three opportunities as sophisticated horizontal cards:
 
 - Circular or horizontal overall readiness visual: `78 / 100 Bid readiness`
 - Four concise rows with evidence-state icons:
-  - Capabilities — Strong
-  - Past performance — Needs one reference
-  - Certifications — Complete
-  - Insurance — Verify expiry
+  - Capabilities - Strong
+  - Past performance - Needs one reference
+  - Certifications - Complete
+  - Insurance - Verify expiry
 - `View company profile` link
 
 #### Bottom panel
@@ -230,7 +230,7 @@ Display the top three opportunities as sophisticated horizontal cards:
 
 ---
 
-### Page B — Opportunities (`/opportunities`)
+### Page B - Opportunities (`/opportunities`)
 
 #### Goal
 
@@ -268,7 +268,7 @@ Include all 12 sample tenders, but make the first three especially polished and 
 
 ---
 
-### Page C — Tender analysis (`/opportunities/[id]`)
+### Page C - Tender analysis (`/opportunities/[id]`)
 
 #### Goal
 
@@ -301,10 +301,10 @@ Large 8/4 split card.
 - label: `Strong fit for Northern Grid Solutions`
 - sentence: `Your clean-energy expertise, Ontario coverage, and municipal utility experience closely match this opportunity.`
 - Four segmented metric bars:
-  - Service fit — 94%
-  - Eligibility — 100%
-  - Project evidence — 68%
-  - Operational fit — 86%
+  - Service fit - 94%
+  - Eligibility - 100%
+  - Project evidence - 68%
+  - Operational fit - 86%
 
 **Right:**
 
@@ -336,10 +336,10 @@ Large 8/4 split card.
 
 1. **Next actions**
    - Checklist with due-date offsets:
-     - `Today — Confirm insurance expiry`
-     - `Within 2 days — Add Waterloo utility project reference`
-     - `Within 5 days — Draft technical approach`
-     - `Before Oct 13 — Internal compliance review`
+     - `Today - Confirm insurance expiry`
+     - `Within 2 days - Add Waterloo utility project reference`
+     - `Within 5 days - Draft technical approach`
+     - `Before Oct 13 - Internal compliance review`
    - Progress indicator such as `1 of 4 complete`.
 
 2. **AI Bid Coach**
@@ -354,7 +354,7 @@ Large 8/4 split card.
 
 #### Bid-plan interaction
 
-The `Generate bid plan` button opens a right-side drawer or modal—not a new page. It contains:
+The `Generate bid plan` button opens a right-side drawer or modal-not a new page. It contains:
 
 - Title: `Bid plan for Energy Efficiency Retrofit Services`
 - Four phases: qualify, prepare evidence, write response, review & submit
@@ -363,7 +363,7 @@ The `Generate bid plan` button opens a right-side drawer or modal—not a new pa
 
 ---
 
-### Page D — Company profile (`/profile`)
+### Page D - Company profile (`/profile`)
 
 #### Goal
 
@@ -406,7 +406,7 @@ Form edits should update client state, and match scores should plausibly change 
 
 ---
 
-### Optional Page E — Proposal review
+### Optional Page E - Proposal review
 
 Only build this after Pages A–D are complete.
 
@@ -555,32 +555,32 @@ Create 12 believable opportunities. The exact source URLs can be the official po
 
 Required opportunities:
 
-1. **Energy Efficiency Retrofit Services** — Natural Resources Canada — CanadaBuys — Ontario — closing Oct 15, 2026 — target score 86 / Pursue.
-2. **Municipal Building Energy Management Platform** — Ontario Infrastructure and Lands Corporation — Ontario Tenders — Ontario — target score 79 / Pursue.
-3. **Climate Data Modernization Advisory Services** — Environment and Climate Change Canada — CanadaBuys — hybrid/remote — target score 68 / Partner.
-4. **EV Fleet Charging Infrastructure** — City/municipal opportunity — Ontario Tenders — target score 62 / Partner.
-5. **Cybersecurity Managed Services** — provincial opportunity — target score 37 / Pass; lack of core cybersecurity capability.
-6. **Road Reconstruction General Contractor** — federal/provincial opportunity — target score 22 / Pass.
-7. **Energy Modelling and Verification Services** — Ontario Tenders — target score 74 / Pursue.
-8. **Public Sector Data Dashboard** — CanadaBuys — target score 71 / Pursue.
-9. **Solar Feasibility Study** — Ontario Tenders — target score 66 / Partner.
-10. **Fleet Telematics Hardware Supply** — CanadaBuys — target score 41 / Pass.
-11. **Building Automation Assessment** — Ontario Tenders — target score 83 / Pursue.
-12. **Sustainability Reporting Services** — CanadaBuys — target score 73 / Pursue.
+1. **Energy Efficiency Retrofit Services** - Natural Resources Canada - CanadaBuys - Ontario - closing Oct 15, 2026 - target score 86 / Pursue.
+2. **Municipal Building Energy Management Platform** - Ontario Infrastructure and Lands Corporation - Ontario Tenders - Ontario - target score 79 / Pursue.
+3. **Climate Data Modernization Advisory Services** - Environment and Climate Change Canada - CanadaBuys - hybrid/remote - target score 68 / Partner.
+4. **EV Fleet Charging Infrastructure** - City/municipal opportunity - Ontario Tenders - target score 62 / Partner.
+5. **Cybersecurity Managed Services** - provincial opportunity - target score 37 / Pass; lack of core cybersecurity capability.
+6. **Road Reconstruction General Contractor** - federal/provincial opportunity - target score 22 / Pass.
+7. **Energy Modelling and Verification Services** - Ontario Tenders - target score 74 / Pursue.
+8. **Public Sector Data Dashboard** - CanadaBuys - target score 71 / Pursue.
+9. **Solar Feasibility Study** - Ontario Tenders - target score 66 / Partner.
+10. **Fleet Telematics Hardware Supply** - CanadaBuys - target score 41 / Pass.
+11. **Building Automation Assessment** - Ontario Tenders - target score 83 / Pursue.
+12. **Sustainability Reporting Services** - CanadaBuys - target score 73 / Pursue.
 
 For the top tender, use these requirements:
 
-- Ontario business registration — mandatory — verified — `Tender §3.2`
-- Professional liability insurance of at least $2M — mandatory — verified — `Tender §3.4`
-- Two comparable energy-retrofit or energy-management projects — mandatory — needs evidence — `Tender §4.1`
-- Ontario implementation coverage — mandatory — verified — `Tender §3.3`
-- Carbon-reduction measurement methodology — rated requirement — verified — `Tender §5.2`
+- Ontario business registration - mandatory - verified - `Tender §3.2`
+- Professional liability insurance of at least $2M - mandatory - verified - `Tender §3.4`
+- Two comparable energy-retrofit or energy-management projects - mandatory - needs evidence - `Tender §4.1`
+- Ontario implementation coverage - mandatory - verified - `Tender §3.3`
+- Carbon-reduction measurement methodology - rated requirement - verified - `Tender §5.2`
 
 Use evaluation criteria:
 
-- Technical approach — 45% — `Connect the proposed energy-management workflow to the buyer’s facility portfolio and reporting needs.`
-- Relevant experience — 35% — `Lead with the Waterloo utility project and quantify the outcome.`
-- Value and pricing — 20% — `Show phased delivery and transparent milestone pricing.`
+- Technical approach - 45% - `Connect the proposed energy-management workflow to the buyer’s facility portfolio and reporting needs.`
+- Relevant experience - 35% - `Lead with the Waterloo utility project and quantify the outcome.`
+- Value and pricing - 20% - `Show phased delivery and transparent milestone pricing.`
 
 ---
 

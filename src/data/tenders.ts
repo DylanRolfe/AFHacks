@@ -120,7 +120,7 @@ export const tenders: Tender[] = [
           id: "security",
           text: "Security/clearance requirement",
           mandatory: true,
-          sourceReference: "Tender §3.6 — security schedule",
+          sourceReference: "Tender §3.6 - security schedule",
           kind: "security",
         },
         {

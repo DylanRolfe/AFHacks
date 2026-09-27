@@ -197,6 +197,18 @@ for (const width of [1440, 768, 390])
       await page.goto(path);
       await expect(page.locator("h1")).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
+      if (label === "landing") {
+        await page.locator(".story-hero-requirement").last().evaluate(async (element) => {
+          await Promise.all(element.getAnimations().map((animation) => animation.finished));
+        });
+        const heroBottom = await page.locator(".story-hero").evaluate(
+          (element) => element.getBoundingClientRect().bottom,
+        );
+        const ledgerBottom = await page.locator(".story-hero-ledger").evaluate(
+          (element) => element.getBoundingClientRect().bottom,
+        );
+        expect(ledgerBottom, "readiness ledger stays inside the hero").toBeLessThanOrEqual(heroBottom);
+      }
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
       );
@@ -246,7 +258,7 @@ test("public CTA opens the fictional sample without overwriting a saved company"
   await expect(page.locator(".sidebar")).toHaveCount(0);
   await expect(
     page.getByRole("heading", {
-      name: "Before you spend weeks bidding, know whether you are ready.",
+      name: "Before you commit to a proposal, know what you can prove.",
     }),
   ).toBeVisible();
   await page
@@ -282,6 +294,19 @@ test("public CTA opens the fictional sample without overwriting a saved company"
 
 test("public story reveals on scroll and respects reduced motion", async ({ page }) => {
   await page.goto("/about");
+  await page.getByRole("link", { name: "Our mission" }).click();
+  await expect(page).toHaveURL(/#mission$/);
+  const phrases = page.locator("[data-manifesto-phrase]");
+  await expect(phrases.first()).toHaveClass(/is-active|is-past/);
+  await page.evaluate(() => {
+    const mission = document.querySelector<HTMLElement>(".story-manifesto")!;
+    document.documentElement.style.scrollBehavior = "auto";
+    window.scrollTo(
+      0,
+      mission.offsetTop + (mission.offsetHeight - window.innerHeight) * 0.65,
+    );
+  });
+  await expect(phrases.nth(1)).toHaveClass(/is-active|is-past/);
   const canada = page.locator(".story-canada .story-container");
   await canada.scrollIntoViewIfNeeded();
   await expect(canada).toHaveClass(/is-visible/);

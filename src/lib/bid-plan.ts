@@ -91,12 +91,12 @@ export function formatBidPlan(
     `Readiness plan for ${tender.title}`,
     company.name,
     outcomeLabels[match.decision],
-    `Closes ${tender.closingDate} — ${tender.tenderNumber}`,
-    "DEMO DATA — verify all details against the official notice.",
+    `Closes ${tender.closingDate} - ${tender.tenderNumber}`,
+    "DEMO DATA - verify all details against the official notice.",
     "Timing below is suggested internal planning, not tender-imposed deadlines.",
     "",
     ...createBidPlan(company, tender, match).flatMap((p, i) => [
-      `${i + 1}. ${p.title} — ${p.timing} — Owner: ${p.owner}`,
+      `${i + 1}. ${p.title} - ${p.timing} - Owner: ${p.owner}`,
       ...p.tasks.map(
         (t, j) => `[${completed.includes(`${i}-${j}`) ? "x" : " "}] ${t}`,
       ),

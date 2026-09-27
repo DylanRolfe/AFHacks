@@ -12,7 +12,7 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: { default: "BidNorth — Pre-bid readiness", template: "%s | BidNorth" },
+  title: { default: "BidNorth - Pre-bid readiness", template: "%s | BidNorth" },
   description:
     "Know if you are ready before you bid. A pre-bid readiness check for Canadian small businesses.",
 };
